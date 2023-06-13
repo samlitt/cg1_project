@@ -1,8 +1,7 @@
 'use strict'
 
-import { loadImage } from "./load.js";
-import { mat4, toRadian, mat3, vec3} from "./matrix.js";
-import { createCamera, createContext, createCube, createLight, createMaterial, createObject, createProgram, createSkyboxSphere, createWorldMatrix } from "./utils.js";
+import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
+import { createCamera, createContext, createLight, createMaterial, createObject, createProgram, createSkyboxSphere } from "./utils.js";
 
 const { gl, canvas } = createContext('canvas')
 
@@ -44,23 +43,10 @@ camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
 
-// Calculate Cam Direction (only once because camera is not animated)
-const inverseViewMatrix = new Float32Array(9)
-const camDir = new Float32Array(3)
-mat3.fromMat4(inverseViewMatrix, camera.viewMatrix)
-mat3.inverse(inverseViewMatrix, inverseViewMatrix)
-vec3.mulMat3(camDir, [0, 0, 1], inverseViewMatrix)
-
-const camDirUniformLocation = gl.getUniformLocation(sphereMappingProgram, 'u_camDir')
-gl.useProgram(sphereMappingProgram)
-gl.uniform3fv(camDirUniformLocation, camDir)
-gl.useProgram(null)
-
 // Variables
 
-const worldMatrix = new Float32Array(16)
-mat4.identity(worldMatrix)
-faucet.worldMatrix = worldMatrix
+const inverseViewMatrix = new Float32Array(9)
+const camDir = new Float32Array(3)
 
 // Render Loop
 
@@ -71,15 +57,30 @@ function render() {
 
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
+	// -- Camera
+
+	// TODO: don't apply the rotation everytime to the view matrix, 
+	// because it will lead to numeral errors
+	mat4.rotate(camera.viewMatrix, camera.viewMatrix, rotationFactor, [0, 1, 0]) 
+	camera.apply(basicShadingProgram)
+	camera.apply(sphereMappingProgram)
+	camera.apply(skyboxProgram)
+
+	// Calculate Cam Direction
+	mat3.fromMat4(inverseViewMatrix, camera.viewMatrix)
+	mat3.inverse(inverseViewMatrix, inverseViewMatrix)
+	vec3.mulMat3(camDir, [0, 0, 1], inverseViewMatrix)
+
+	const camDirUniformLocation = gl.getUniformLocation(sphereMappingProgram, 'u_camDir')
+	gl.useProgram(sphereMappingProgram)
+	gl.uniform3fv(camDirUniformLocation, camDir)
+	gl.useProgram(null)
+
 	// -- Skybox
 
 	skybox.draw()
 
 	// -- Faucet
-
-	// Set Position
-	mat4.identity(worldMatrix)
-	mat4.rotate(worldMatrix, worldMatrix, rotation, [0.0, 1.0, 0.0])
 
 	faucet.draw(camera)
 

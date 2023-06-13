@@ -191,6 +191,8 @@ export async function createObject(gl, program, objPath) {
 	const matWorldNormalUniformLocation = gl.getUniformLocation(program, 'u_matWorldNormal')
 	const matViewNormalUniformLocation = gl.getUniformLocation(program, 'u_matViewNormal')
 
+	const worldMatrix = new Float32Array(16)
+	mat4.identity(worldMatrix)
 	const worldViewMatrix = new Float32Array(16)
 	const worldNormalMatrix = new Float32Array(9)
 	const viewNormalMatrix = new Float32Array(9)
@@ -289,7 +291,7 @@ export async function createObject(gl, program, objPath) {
 
 	return {
 		material: null,
-		worldMatrix: null,
+		worldMatrix,
 		draw
 	}
 }
