@@ -15,34 +15,35 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
 const camera = createCamera(gl)
 
-const teapotProgram = await createProgram(gl, './shader/teapot')
-const teapot = await createObject(gl, teapotProgram, './assets/teapot.obj')
+const basicShadingProgram = await createProgram(gl, './shader/basic_shading')
+const faucet = await createObject(gl, basicShadingProgram, './assets/faucet.obj')
 
-const light = createLight(gl, teapotProgram, [1.0, 1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0])
-const material = createMaterial(gl, teapotProgram, [0.0, 0.0, 0.0], [0.17, 0.01, 0.01], [0.61, 0.40, 0.40], [0.73, 0.63, 0.63], 5)
+const light = createLight(gl, basicShadingProgram, [1.0, 1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0])
+light.apply()
 
-camera.configure([0.0, 2.0, -8.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], 45, canvas.height / canvas.width)
-camera.apply(teapotProgram)
+const material = createMaterial(gl, basicShadingProgram, [0.0, 0.0, 0.0], [0.17, 0.01, 0.01], [0.61, 0.40, 0.40], [0.73, 0.63, 0.63], 5)
+
+camera.configure([0.0, 2.0, -8.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], toRadian(45), canvas.height / canvas.width)
+camera.apply(basicShadingProgram)
 
 const worldMatrix = new Float32Array(16)
 mat4.identity(worldMatrix)
 
-teapot.material = material
-teapot.worldMatrix = worldMatrix
+faucet.material = material
+faucet.worldMatrix = worldMatrix
+
+mat4.scale(worldMatrix, worldMatrix, [0.02, 0.02, 0.02])
 
 let rotation = 0
 const rotationFactor = Math.PI / 512
 function render() {
 	rotation += rotationFactor
 
-	gl.clearColor(0.0, 0.0, 0.0, 1.0)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 	mat4.rotate(worldMatrix, worldMatrix, rotationFactor, [0.0, 1.0, 0.0])
 
-	light.apply()
-
-	teapot.draw(camera)
+	faucet.draw(camera)
 
 	requestAnimationFrame(render)
 }

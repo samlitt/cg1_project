@@ -37,8 +37,18 @@ export async function loadObj(path) {
 				const [vertexIndex, textureIndex, normalIndex] = item.trim().split('/').map(num => parseInt(num))
 
 				vbo.push(...vertices[vertexIndex - 1])
-				vbo.push(...textures[textureIndex - 1])
-				vbo.push(...normals[normalIndex - 1])
+
+				if (!isNaN(textureIndex)) {
+					vbo.push(...textures[textureIndex - 1])
+				} else {
+					vbo.push(0.0, 0.0)
+				}
+
+				if (!isNaN(normalIndex)) {
+					vbo.push(...normals[normalIndex - 1])
+				} else {
+					vbo.push(0.0, 0.0, 0.0)
+				}
 			}
 		}
 	}
