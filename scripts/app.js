@@ -23,7 +23,7 @@ light.apply()
 
 const material = createMaterial(gl, basicShadingProgram, [0.0, 0.0, 0.0], [0.17, 0.01, 0.01], [0.61, 0.40, 0.40], [0.73, 0.63, 0.63], 5)
 
-camera.configure([0.0, 2.0, -8.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], toRadian(45), canvas.height / canvas.width)
+camera.configure([0.0, 2.0, -8.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], toRadian(45), canvas.width / canvas.height)
 camera.apply(basicShadingProgram)
 
 const worldMatrix = new Float32Array(16)
