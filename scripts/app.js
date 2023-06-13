@@ -32,8 +32,6 @@ mat4.identity(worldMatrix)
 faucet.material = material
 faucet.worldMatrix = worldMatrix
 
-mat4.scale(worldMatrix, worldMatrix, [0.02, 0.02, 0.02])
-
 let rotation = 0
 const rotationFactor = Math.PI / 512
 function render() {
