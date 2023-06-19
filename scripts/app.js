@@ -38,7 +38,7 @@ const material = createMaterial(gl, basicShadingProgram, [0.0, 0.0, 0.0], [0.17,
 
 const camera = createCamera(gl)
 
-camera.configure([0.0, 2.0, -5.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], toRadian(45), canvas.height / canvas.width)
+camera.configure([0.0, 2.0, -5.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], toRadian(45), canvas.width / canvas.height)
 camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
