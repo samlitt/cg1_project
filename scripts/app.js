@@ -45,23 +45,50 @@ camera.apply(skyboxProgram)
 
 // Variables
 
+
 const inverseViewMatrix = new Float32Array(9)
 const camDir = new Float32Array(3)
 
+// Camera Movement
+
+const originalViewMatrix = new Float32Array(camera.viewMatrix)
+
+const rotationFactor = Math.PI / 256
+const maxRotation = Math.PI / 2 // Quarter circle
+let rotation = 0
+
+const zoomFactor = 0.1
+const maxZoom = 1
+const minZoom = -6
+window.zoom = 0
+
+window.addEventListener('keydown', (event) => {
+	if (event.key === 'd' && rotation > -maxRotation) {
+		rotation -= rotationFactor 
+	}
+
+	if (event.key === 'a' && rotation < maxRotation) {
+		rotation += rotationFactor 
+	}
+
+	if (event.key === 'w' && zoom < maxZoom) {
+		zoom += zoomFactor
+	}
+
+	if (event.key === 's' && zoom > minZoom) {
+		zoom -= zoomFactor
+	}
+})
+
 // Render Loop
 
-let rotation = 0
-const rotationFactor = Math.PI / 512
 function render() {
-	rotation += rotationFactor
-
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 	// -- Camera
 
-	// TODO: don't apply the rotation everytime to the view matrix, 
-	// because it will lead to numeral errors
-	mat4.rotate(camera.viewMatrix, camera.viewMatrix, rotationFactor, [0, 1, 0]) 
+	mat4.translate(camera.viewMatrix, originalViewMatrix, [0, 0, -zoom])
+	mat4.rotate(camera.viewMatrix, camera.viewMatrix, rotation, [0, 1, 0]) 
 	camera.apply(basicShadingProgram)
 	camera.apply(sphereMappingProgram)
 	camera.apply(skyboxProgram)
