@@ -88,7 +88,7 @@ const camDir = new Float32Array(3)
 const originalViewMatrix = new Float32Array(camera.viewMatrix)
 
 const rotationFactor = Math.PI / 256
-const maxRotation = Math.PI / 2 // Quarter circle
+const maxRotation = 2 * Math.PI // Quarter circle
 let rotation = 0
 
 const zoomFactor = 0.1
@@ -126,6 +126,7 @@ function render() {
 	camera.apply(basicShadingProgram)
 	camera.apply(sphereMappingProgram)
 	camera.apply(skyboxProgram)
+	camera.apply(textureShadingProgram)
 
 	// Calculate Cam Direction
 	mat3.fromMat4(inverseViewMatrix, camera.viewMatrix)
@@ -147,7 +148,7 @@ function render() {
 
 	// -- Lime
 
-	lime.draw();
+	lime.draw(camera);
 
 	requestAnimationFrame(render);
 }

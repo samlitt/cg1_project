@@ -15,6 +15,7 @@ uniform vec4 u_lightPos;
 uniform vec3 u_lightAmbient;
 uniform vec3 u_lightDiffuse;
 uniform vec3 u_lightSpecular;
+uniform mat4 u_matView;
 
 void main() {
   vec3 N = normalize(v_normal);
@@ -25,7 +26,7 @@ void main() {
 
   vec3 L = vec3(0.0);
   if (u_lightPos.w == 0.0) {
-    L = normalize(vec3(u_lightPos));
+    L = normalize(vec3(u_matView * u_lightPos));
   } else {
     L = normalize(vec3(u_lightPos) - v_position);
   }
