@@ -1,9 +1,20 @@
 'use strict'
 
 import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
-import { createCamera, createContext, createLight, createMaterial, createObject, createProgram, createSkyboxSphere } from "./utils.js";
+import { loadImage } from "./load.js";
 
-const { gl, canvas } = createContext('canvas')
+import {
+	createCamera,
+	createContext,
+	createLight,
+	createMaterial,
+	createObject,
+	createProgram,
+	createTexture,
+	createSkyboxSphere
+} from "./utils.js";
+
+const { gl, canvas } = createContext('canvas');
 
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 gl.enable(gl.DEPTH_TEST);
@@ -17,22 +28,44 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 const basicShadingProgram = await createProgram(gl, './shader/basic_shading')
 const sphereMappingProgram = await createProgram(gl, './shader/sphere_mapping')
 const skyboxProgram = await createProgram(gl, './shader/skybox')
+const textureShadingProgram = await createProgram(gl, "./shader/textureShading");
 
 // Objects
 
 const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj')
+const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
 skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
 // Lights
 
-const light = createLight(gl, basicShadingProgram, [1.0, 1.0, 1.0, 0.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0])
+const light = createLight(
+gl,
+textureShadingProgram,
+[1.0, 1.0, 1.0, 0.0],
+[1.0, 1.0, 1.0],
+[1.0, 1.0, 1.0],
+[1.0, 1.0, 1.0]);
 light.apply()
+
+// Textures
+
+let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true);
+lime_texture.load(textureShadingProgram, "u_sampler");
 
 // Materials
 
-const material = createMaterial(gl, basicShadingProgram, [0.0, 0.0, 0.0], [0.17, 0.01, 0.01], [0.61, 0.40, 0.40], [0.73, 0.63, 0.63], 5)
-// faucet.material = material
+const material = createMaterial(
+	gl,
+	textureShadingProgram,
+	[0.0, 0.0, 0.0], 		// emissive
+	[0.4, 0.4, 0.4], // ambient
+	[0.4, 0.4, 0.4], // diffuse
+	[0.5, 0.5, 0.5], // specular
+	1.0										// shininess
+);
+
+lime.material = material;
 
 // Camera
 
@@ -42,6 +75,7 @@ camera.configure([0.0, 2.0, -5.0], [0.0, 0.0, 0.0], [0.0, 1.0, 0.0], toRadian(45
 camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
+camera.apply(textureShadingProgram);
 
 // Variables
 
@@ -64,11 +98,11 @@ let zoom = 0
 
 window.addEventListener('keydown', (event) => {
 	if (event.key === 'd' && rotation > -maxRotation) {
-		rotation -= rotationFactor 
+		rotation -= rotationFactor
 	}
 
 	if (event.key === 'a' && rotation < maxRotation) {
-		rotation += rotationFactor 
+		rotation += rotationFactor
 	}
 
 	if (event.key === 'w' && zoom < maxZoom) {
@@ -88,7 +122,7 @@ function render() {
 	// -- Camera
 
 	mat4.translate(camera.viewMatrix, originalViewMatrix, [0, 0, -zoom])
-	mat4.rotate(camera.viewMatrix, camera.viewMatrix, rotation, [0, 1, 0]) 
+	mat4.rotate(camera.viewMatrix, camera.viewMatrix, rotation, [0, 1, 0])
 	camera.apply(basicShadingProgram)
 	camera.apply(sphereMappingProgram)
 	camera.apply(skyboxProgram)
@@ -111,7 +145,11 @@ function render() {
 
 	faucet.draw(camera)
 
-	requestAnimationFrame(render)
+	// -- Lime
+
+	lime.draw();
+
+	requestAnimationFrame(render);
 }
 
 requestAnimationFrame(render)

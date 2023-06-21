@@ -1,5 +1,5 @@
 import { loadShader, loadObj, loadImage } from "./load.js"
-import { mat4, mat3 } from './matrix.js' 
+import { mat4, mat3 } from './matrix.js'
 
 export function createContext(canvasId) {
 	/** @type {HTMLCanvasElement} */
@@ -9,78 +9,80 @@ export function createContext(canvasId) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export async function createProgram(gl, path) {
-	const vertexShaderText = await loadShader(`${path}/vertex.glsl`)
+	const vertexShaderText = await loadShader(`${path}/vertex.glsl`);
 	const vertexShader = gl.createShader(gl.VERTEX_SHADER);
 	gl.shaderSource(vertexShader, vertexShaderText);
 	gl.compileShader(vertexShader);
 	if (!gl.getShaderParameter(vertexShader, gl.COMPILE_STATUS)) {
-		throw new Error(`ERROR compiling vertex shader: ${gl.getShaderInfoLog(vertexShader)}`)
+		throw new Error(`ERROR compiling vertex shader: ${gl.getShaderInfoLog(vertexShader)}`);
 	}
-	
-	const fragmentShaderText = await loadShader(`${path}/fragment.glsl`)
+
+	const fragmentShaderText = await loadShader(`${path}/fragment.glsl`);
 	const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 	gl.shaderSource(fragmentShader, fragmentShaderText);
 	gl.compileShader(fragmentShader);
 	if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
-		throw new Error(`ERROR compiling fragment shader: ${gl.getShaderInfoLog(fragmentShader)}`)
+		throw new Error(`ERROR compiling fragment shader: ${gl.getShaderInfoLog(fragmentShader)}`);
 	}
-	
+
 	const program = gl.createProgram();
 	gl.attachShader(program, vertexShader);
 	gl.attachShader(program, fragmentShader);
 	gl.linkProgram(program);
 	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		throw new Error(`ERROR linking program: ${gl.getProgramInfoLog(program)}`)
+		throw new Error(`ERROR linking program: ${gl.getProgramInfoLog(program)}`);
 	}
 	gl.validateProgram(program);
 	if (!gl.getProgramParameter(program, gl.VALIDATE_STATUS)) {
-		throw new Error(`ERROR validating program: ${gl.getProgramInfoLog(program)}`)
+		throw new Error(`ERROR validating program: ${gl.getProgramInfoLog(program)}`);
 	}
 
 	return program
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export function createTexture(gl, image, textureId, createMipmap) {
-	const texture = gl.createTexture()
-	
-	gl.activeTexture(gl.TEXTURE0 + textureId)
-	gl.bindTexture(gl.TEXTURE_2D, texture)
+	const texture = gl.createTexture();
+
+	update();
+
+	gl.activeTexture(gl.TEXTURE0 + textureId);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
 	if (createMipmap) {
-		gl.generateMipmap(gl.TEXTURE_2D)
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR)
+		gl.generateMipmap(gl.TEXTURE_2D);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 	} else {
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	}
 
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
-	gl.bindTexture(gl.TEXTURE_2D, null)
+	gl.bindTexture(gl.TEXTURE_2D, null);
 
 	function update() {
-		gl.activeTexture(gl.TEXTURE0 + textureId)
-		gl.bindTexture(gl.TEXTURE_2D, texture)
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)
-		gl.bindTexture(gl.TEXTURE_2D, null)
+		gl.activeTexture(gl.TEXTURE0 + textureId);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+		gl.bindTexture(gl.TEXTURE_2D, null);
 	}
 
 	function load(program, uniform) {
-		gl.activeTexture(gl.TEXTURE0 + textureId)
-		gl.bindTexture(gl.TEXTURE_2D, texture)
+		gl.activeTexture(gl.TEXTURE0 + textureId);
+		gl.bindTexture(gl.TEXTURE_2D, texture);
 
-		const samplerUniformLocation = gl.getUniformLocation(program, uniform)
-		gl.useProgram(program)
-		gl.uniform1i(samplerUniformLocation, textureId)
-		gl.useProgram(null)
+		const samplerUniformLocation = gl.getUniformLocation(program, uniform);
+		gl.useProgram(program);
+		gl.uniform1i(samplerUniformLocation, textureId);
+		gl.useProgram(null);
 	}
 
-	update()
+	update();
 
 	return {
 		update,
@@ -89,14 +91,14 @@ export function createTexture(gl, image, textureId, createMipmap) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export function createLight(gl, program, pos, ambient, diffuse, specular) {
-	const posUniformLocation = gl.getUniformLocation(program, 'u_lightPos')
-	const ambientUniformLocation = gl.getUniformLocation(program, 'u_lightAmbient')
-	const diffuseUniformLocation = gl.getUniformLocation(program, 'u_lightDiffuse')
-	const specularUniformLocation = gl.getUniformLocation(program, 'u_lightSpecular')
-	
+	const posUniformLocation = gl.getUniformLocation(program, 'u_lightPos');
+	const ambientUniformLocation = gl.getUniformLocation(program, 'u_lightAmbient');
+	const diffuseUniformLocation = gl.getUniformLocation(program, 'u_lightDiffuse');
+	const specularUniformLocation = gl.getUniformLocation(program, 'u_lightSpecular');
+
 	function apply() {
 		gl.useProgram(program);
 
@@ -105,7 +107,7 @@ export function createLight(gl, program, pos, ambient, diffuse, specular) {
 		gl.uniform3fv(diffuseUniformLocation, diffuse);
 		gl.uniform3fv(specularUniformLocation, specular);
 
-		gl.useProgram(null)
+		gl.useProgram(null);
 	}
 
 	return {
@@ -114,7 +116,7 @@ export function createLight(gl, program, pos, ambient, diffuse, specular) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export function createMaterial(gl, program, emission, ambient, diffuse, specular, shininess) {
 	const emissionUniformLocation = gl.getUniformLocation(program, 'u_mtlEmission')
@@ -122,7 +124,7 @@ export function createMaterial(gl, program, emission, ambient, diffuse, specular
 	const diffuseUniformLocation = gl.getUniformLocation(program, 'u_mtlDiffuse')
 	const specularUniformLocation = gl.getUniformLocation(program, 'u_mtlSpecular')
 	const shininessUniformLocation = gl.getUniformLocation(program, 'u_mtlShininess')
-	
+
 	function apply() {
 		gl.useProgram(program)
 
@@ -141,7 +143,7 @@ export function createMaterial(gl, program, emission, ambient, diffuse, specular
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export function createCamera(gl) {
 	const viewMatrix = new Float32Array(16)
@@ -151,7 +153,7 @@ export function createCamera(gl) {
 
 	function configure(eye, look, up, fovy, aspect) {
 		mat4.lookAt(viewMatrix, eye, look, up)
-		mat4.perspective(projMatrix, fovy, aspect, 0.1, 1000.0);	
+		mat4.perspective(projMatrix, fovy, aspect, 0.1, 1000.0);
 	}
 
 	function apply(program) {
@@ -160,7 +162,7 @@ export function createCamera(gl) {
 		const matViewNormalUniformLocation = gl.getUniformLocation(program, 'u_matViewNormal')
 
 		gl.useProgram(program)
-		
+
 		gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, viewMatrix);
 		gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, projMatrix);
 
@@ -180,7 +182,7 @@ export function createCamera(gl) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export async function createObject(gl, program, objPath) {
 	const positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
@@ -196,9 +198,9 @@ export async function createObject(gl, program, objPath) {
 	const worldViewMatrix = new Float32Array(16)
 	const worldNormalMatrix = new Float32Array(9)
 	const viewNormalMatrix = new Float32Array(9)
-	
+
 	const vertices = await loadObj(objPath)
-	
+
 	const vbo = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
@@ -233,11 +235,11 @@ export async function createObject(gl, program, objPath) {
 		enableVertexAttribArray(positionAttributeLocation);
 		enableVertexAttribArray(texCoordsAttributeLocation)
 		enableVertexAttribArray(normalAttributeLocation);
-		
+
 		if (this.material) {
 			this.material.apply()
 		}
-		
+
 		gl.useProgram(program)
 
 		if (this.worldMatrix) {
@@ -256,7 +258,7 @@ export async function createObject(gl, program, objPath) {
 		}
 
 		gl.drawArrays(gl.TRIANGLES, 0, vertices.length / 8)
-		
+
 		gl.useProgram(null)
 
 		disableVertexAttribArray(positionAttributeLocation)
@@ -297,7 +299,7 @@ export async function createObject(gl, program, objPath) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
  export async function createCubemap(gl, path, textureId) {
 	const cubemapTexture = gl.createTexture()
@@ -359,48 +361,48 @@ export async function createObject(gl, program, objPath) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export async function createSkybox(gl, program, cubemapTexture) {
 	const positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
 
-	const vertices = 
+	const vertices =
 	[ 	// X, Y, Z
 		// Top
 		-1.0, 1.0, -1.0,
-		-1.0, 1.0, 1.0, 
-		1.0, 1.0, 1.0,  
-		1.0, 1.0, -1.0, 
+		-1.0, 1.0, 1.0,
+		1.0, 1.0, 1.0,
+		1.0, 1.0, -1.0,
 
 		// Left
-		-1.0, 1.0, 1.0,   
-		-1.0, -1.0, 1.0,  
-		-1.0, -1.0, -1.0, 
-		-1.0, 1.0, -1.0,  
+		-1.0, 1.0, 1.0,
+		-1.0, -1.0, 1.0,
+		-1.0, -1.0, -1.0,
+		-1.0, 1.0, -1.0,
 
 		// Right
-		1.0, 1.0, 1.0,    
-		1.0, -1.0, 1.0,   
-		1.0, -1.0, -1.0,  
-		1.0, 1.0, -1.0,   
+		1.0, 1.0, 1.0,
+		1.0, -1.0, 1.0,
+		1.0, -1.0, -1.0,
+		1.0, 1.0, -1.0,
 
 		// Front
-		1.0, 1.0, 1.0,  
-		1.0, -1.0, 1.0,  
-		-1.0, -1.0, 1.0,  
-		-1.0, 1.0, 1.0,  
+		1.0, 1.0, 1.0,
+		1.0, -1.0, 1.0,
+		-1.0, -1.0, 1.0,
+		-1.0, 1.0, 1.0,
 
 		// Back
-		1.0, 1.0, -1.0,  
-		1.0, -1.0, -1.0,  
-		-1.0, -1.0, -1.0,  
-		-1.0, 1.0, -1.0,  
+		1.0, 1.0, -1.0,
+		1.0, -1.0, -1.0,
+		-1.0, -1.0, -1.0,
+		-1.0, 1.0, -1.0,
 
 		// Bottom
 		-1.0, -1.0, -1.0,
-		-1.0, -1.0, 1.0, 
-		1.0, -1.0, 1.0,  
-		1.0, -1.0, -1.0, 
+		-1.0, -1.0, 1.0,
+		1.0, -1.0, 1.0,
+		1.0, -1.0, -1.0,
 	];
 
 	const indices =
@@ -456,17 +458,17 @@ export async function createSkybox(gl, program, cubemapTexture) {
 		)
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, null)
-		
+
 		gl.enableVertexAttribArray(positionAttributeLocation)
-		
+
 		cubemapTexture.load(program, 'u_skybox')
-		
+
 		gl.useProgram(program)
 
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo)
 		gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
-		
+
 		gl.bindTexture(gl.TEXTURE_CUBE_MAP, null)
 
 		gl.useProgram(null)
@@ -507,7 +509,7 @@ export async function createSkyboxSphere(gl, program, spherePath, texturePath) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export function createCube(gl, program, colors) {
 	if (!colors) {
@@ -533,8 +535,8 @@ export function createCube(gl, program, colors) {
 	const positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
 	const colorAttributeLocation = gl.getAttribLocation(program, 'a_color')
 
-	const vertices = 
-	[ 	// X, Y, Z           R, G, B       		
+	const vertices =
+	[ 	// X, Y, Z           R, G, B
 		// Top
 		-1.0, 1.0, -1.0,   ...colors.top,
 		-1.0, 1.0, 1.0,    ...colors.top,
@@ -554,16 +556,16 @@ export function createCube(gl, program, colors) {
 		1.0, 1.0, -1.0,   ...colors.right,
 
 		// Front
-		1.0, 1.0, 1.0,    ...colors.front,	
-		1.0, -1.0, 1.0,    ...colors.front,	
+		1.0, 1.0, 1.0,    ...colors.front,
+		1.0, -1.0, 1.0,    ...colors.front,
 		-1.0, -1.0, 1.0,    ...colors.front,
-		-1.0, 1.0, 1.0,    ...colors.front,	
+		-1.0, 1.0, 1.0,    ...colors.front,
 
 		// Back
-		1.0, 1.0, -1.0,    ...colors.back,	
-		1.0, -1.0, -1.0,    ...colors.back,	
+		1.0, 1.0, -1.0,    ...colors.back,
+		1.0, -1.0, -1.0,    ...colors.back,
 		-1.0, -1.0, -1.0,    ...colors.back,
-		-1.0, 1.0, -1.0,    ...colors.back,	
+		-1.0, 1.0, -1.0,    ...colors.back,
 
 		// Bottom
 		-1.0, -1.0, -1.0,   ...colors.bottom,
@@ -631,7 +633,7 @@ export function createCube(gl, program, colors) {
 		)
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, null)
-		
+
 		gl.enableVertexAttribArray(positionAttributeLocation)
 		gl.enableVertexAttribArray(colorAttributeLocation)
 
@@ -640,7 +642,7 @@ export function createCube(gl, program, colors) {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo)
 		gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
-		
+
 		gl.useProgram(null)
 		gl.disableVertexAttribArray(positionAttributeLocation)
 		gl.disableVertexAttribArray(colorAttributeLocation)
@@ -652,7 +654,7 @@ export function createCube(gl, program, colors) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 export function createWorldMatrix(gl, program) {
 	const matWorldUniformLocation = gl.getUniformLocation(program, 'u_matWorld')
