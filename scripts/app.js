@@ -60,7 +60,7 @@ let rotation = 0
 const zoomFactor = 0.1
 const maxZoom = 1
 const minZoom = -6
-window.zoom = 0
+let zoom = 0
 
 window.addEventListener('keydown', (event) => {
 	if (event.key === 'd' && rotation > -maxRotation) {
