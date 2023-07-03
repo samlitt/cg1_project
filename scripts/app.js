@@ -34,6 +34,7 @@ const textureShadingProgram = await createProgram(gl, "./shader/texture_shading"
 
 const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj')
 const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
+const ipad = await createObject(gl, basicShadingProgram, './assets/ipad.obj');
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
 skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -41,12 +42,12 @@ skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
 const light = createLight(
 gl,
-textureShadingProgram,
 [1.0, 1.0, 1.0, 0.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0]);
-light.apply()
+light.apply(textureShadingProgram)
+light.apply(basicShadingProgram)
 
 // Textures
 
@@ -55,17 +56,29 @@ lime_texture.load(textureShadingProgram, "u_sampler");
 
 // Materials
 
-const material = createMaterial(
+const limeMaterial = createMaterial(
 	gl,
 	textureShadingProgram,
-	[0.0, 0.0, 0.0], 		// emissive
+	[0.0, 0.0, 0.0], // emissive
 	[0.4, 0.4, 0.4], // ambient
 	[0.4, 0.4, 0.4], // diffuse
 	[0.5, 0.5, 0.5], // specular
-	1.0										// shininess
+	1.0				  // shininess
 );
 
-lime.material = material;
+lime.material = limeMaterial;
+
+const ipadMaterial = createMaterial(
+	gl,
+	basicShadingProgram,
+	[0.0, 0.0, 0.0], // emissive
+	[0.00, 0.00, 0.00], // ambient
+	[0.00, 0.00, 0.00], // diffuse
+	[0.33, 0.33, 0.33], // specular
+	0.06 * 4				  // shininess
+);
+
+ipad.material = ipadMaterial
 
 // Camera
 
@@ -76,12 +89,6 @@ camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
 camera.apply(textureShadingProgram);
-
-// Variables
-
-
-const inverseViewMatrix = new Float32Array(9)
-const camDir = new Float32Array(3)
 
 // Camera Movement
 
@@ -114,6 +121,16 @@ window.addEventListener('keydown', (event) => {
 	}
 })
 
+// Variables
+
+const inverseViewMatrix = new Float32Array(9)
+const camDir = new Float32Array(3)
+
+const ipadWorldMatrix = new Float32Array(16)
+mat4.identity(ipadWorldMatrix)
+mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [4, 4, 4])
+ipad.worldMatrix = ipadWorldMatrix
+
 // Render Loop
 
 function render() {
@@ -144,11 +161,13 @@ function render() {
 
 	// -- Faucet
 
-	faucet.draw(camera)
+	// faucet.draw(camera)
 
 	// -- Lime
 
-	lime.draw(camera);
+	// lime.draw(camera);
+
+	ipad.draw(camera)
 
 	requestAnimationFrame(render);
 }

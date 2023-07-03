@@ -103,13 +103,14 @@ export function createTexture(gl, image, textureId, createMipmap, createAnisotro
 /**
  * @param {WebGLRenderingContext} gl
  */
-export function createLight(gl, program, pos, ambient, diffuse, specular) {
-	const posUniformLocation = gl.getUniformLocation(program, 'u_lightPos');
-	const ambientUniformLocation = gl.getUniformLocation(program, 'u_lightAmbient');
-	const diffuseUniformLocation = gl.getUniformLocation(program, 'u_lightDiffuse');
-	const specularUniformLocation = gl.getUniformLocation(program, 'u_lightSpecular');
+export function createLight(gl, pos, ambient, diffuse, specular) {
+	
+	function apply(program) {
+		const posUniformLocation = gl.getUniformLocation(program, 'u_lightPos');
+		const ambientUniformLocation = gl.getUniformLocation(program, 'u_lightAmbient');
+		const diffuseUniformLocation = gl.getUniformLocation(program, 'u_lightDiffuse');
+		const specularUniformLocation = gl.getUniformLocation(program, 'u_lightSpecular');
 
-	function apply() {
 		gl.useProgram(program);
 
 		gl.uniform4fv(posUniformLocation, pos);
