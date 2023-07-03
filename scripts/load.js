@@ -186,7 +186,7 @@ export async function loadMtl(mtlPath) {
 		}
 
 		if (identifier === 'Ns') {
-			shininess = parseFloat(items[0]) * 100
+			shininess = parseFloat(items[0])
 		}
 	}
 
