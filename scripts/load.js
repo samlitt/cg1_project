@@ -9,7 +9,7 @@ export async function loadObj(path) {
 	const text = await res.text()
 
 	const lines = text.split(/\r*\n/)
-	
+
 	let vertices = []
 	let normals = []
 	let textures = []
@@ -35,6 +35,8 @@ export async function loadObj(path) {
 		if (identifier === 'f') {
 			for (const item of items) {
 				const [vertexIndex, textureIndex, normalIndex] = item.trim().split('/').map(num => parseInt(num))
+
+				// console.log(line);
 
 				vbo.push(...vertices[vertexIndex - 1])
 

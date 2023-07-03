@@ -33,7 +33,7 @@ void main() {
 	if (diffuseLight > 0.0) {
 		diffuse = diffuseLight * u_mtlDiffuse * u_lightDiffuse;
 	}
-	
+
 	vec3 specular = vec3(0.0);
 	float specLight = pow(max(dot(H, N), 0.0), u_mtlShininess);
 	if (specLight > 0.0) {
