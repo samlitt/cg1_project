@@ -28,7 +28,7 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 const basicShadingProgram = await createProgram(gl, './shader/basic_shading')
 const sphereMappingProgram = await createProgram(gl, './shader/sphere_mapping')
 const skyboxProgram = await createProgram(gl, './shader/skybox')
-const textureShadingProgram = await createProgram(gl, "./shader/textureShading");
+const textureShadingProgram = await createProgram(gl, "./shader/texture_shading");
 
 // Objects
 
