@@ -1,4 +1,4 @@
-import { loadShader, loadObj, loadImage } from "./load.js"
+import { loadShader, loadObj, loadImage, loadObjWithMaterials, loadMtl } from "./load.js"
 import { mat4, mat3 } from './matrix.js'
 
 export function createContext(canvasId) {
@@ -139,17 +139,22 @@ export function createMaterial(gl, program, emission, ambient, diffuse, specular
 	function apply() {
 		gl.useProgram(program)
 
-		gl.uniform3fv(emissionUniformLocation, emission);
-		gl.uniform3fv(ambientUniformLocation, ambient);
-		gl.uniform3fv(diffuseUniformLocation, diffuse);
-		gl.uniform3fv(specularUniformLocation, specular);
-		gl.uniform1f(shininessUniformLocation, shininess * 4);
+		gl.uniform3fv(emissionUniformLocation, this.emission);
+		gl.uniform3fv(ambientUniformLocation, this.ambient);
+		gl.uniform3fv(diffuseUniformLocation, this.diffuse);
+		gl.uniform3fv(specularUniformLocation, this.specular);
+		gl.uniform1f(shininessUniformLocation, this.shininess * 4);
 
 		gl.useProgram(null)
 	}
 
 	return {
-		apply
+		apply,
+		emission,
+		ambient,
+		diffuse,
+		specular,
+		shininess
 	}
 }
 
@@ -196,6 +201,12 @@ export function createCamera(gl) {
  * @param {WebGLRenderingContext} gl
  */
 export async function createObject(gl, program, objPath) {
+	const vertices = await loadObj(objPath)
+
+	return createObjectFromVertices(gl, program, vertices)
+}
+
+function createObjectFromVertices(gl, program, vertices) {
 	const positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
 	const texCoordsAttributeLocation = gl.getAttribLocation(program, 'a_texCoords')
 	const normalAttributeLocation = gl.getAttribLocation(program, 'a_normal')
@@ -209,8 +220,6 @@ export async function createObject(gl, program, objPath) {
 	const worldViewMatrix = new Float32Array(16)
 	const worldNormalMatrix = new Float32Array(9)
 	const viewNormalMatrix = new Float32Array(9)
-
-	const vertices = await loadObj(objPath)
 
 	const vbo = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
@@ -306,6 +315,29 @@ export async function createObject(gl, program, objPath) {
 		material: null,
 		worldMatrix,
 		draw
+	}
+}
+
+export async function createObjectWithMaterials(gl, program, objPath, mtlPath) {
+	const meshes = await loadObjWithMaterials(objPath)
+	const materials = await loadMtl(mtlPath)
+
+	const objects = meshes.map(mesh => {
+		const object = createObjectFromVertices(gl, program, mesh.vbo)
+		const material = materials[mesh.material]
+		object.material = createMaterial(gl, program, material.emissive, material.ambient, material.diffuse, material.specular, material.shininess)
+
+		return object
+	})
+
+	return {
+		objects,
+		set worldMatrix(newValue) {
+			objects.forEach(o => o.worldMatrix = newValue)
+		},
+		draw(camera) {
+			objects.forEach(o => o.draw(camera))
+		}
 	}
 }
 

@@ -1,7 +1,7 @@
 'use strict'
 
-import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 import { loadImage } from "./load.js";
+import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 
 import {
 	createCamera,
@@ -9,9 +9,10 @@ import {
 	createLight,
 	createMaterial,
 	createObject,
+	createObjectWithMaterials,
 	createProgram,
-	createTexture,
-	createSkyboxSphere
+	createSkyboxSphere,
+	createTexture
 } from "./utils.js";
 
 const { gl, canvas } = createContext('canvas');
@@ -34,7 +35,7 @@ const textureShadingProgram = await createProgram(gl, "./shader/texture_shading"
 
 const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj')
 const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
-const ipad = await createObject(gl, basicShadingProgram, './assets/ipad.obj');
+const ipad = await createObjectWithMaterials(gl, basicShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
 skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -42,7 +43,7 @@ skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
 const light = createLight(
 gl,
-[1.0, 1.0, 1.0, 0.0],
+[0.0, 0.0, 1.0, 0.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0]);
@@ -67,18 +68,6 @@ const limeMaterial = createMaterial(
 );
 
 lime.material = limeMaterial;
-
-const ipadMaterial = createMaterial(
-	gl,
-	basicShadingProgram,
-	[0.0, 0.0, 0.0], // emissive
-	[0.00, 0.00, 0.00], // ambient
-	[0.00, 0.00, 0.00], // diffuse
-	[0.33, 0.33, 0.33], // specular
-	0.06 * 4				  // shininess
-);
-
-ipad.material = ipadMaterial
 
 // Camera
 
@@ -128,7 +117,9 @@ const camDir = new Float32Array(3)
 
 const ipadWorldMatrix = new Float32Array(16)
 mat4.identity(ipadWorldMatrix)
-mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [4, 4, 4])
+mat4.translate(ipadWorldMatrix, ipadWorldMatrix, [0, -1, 0])
+mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [8, 8, 8])
+mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-45), [0, 1, 0])
 ipad.worldMatrix = ipadWorldMatrix
 
 // Render Loop
