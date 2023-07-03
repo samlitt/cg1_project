@@ -695,23 +695,3 @@ export function createCube(gl, program, colors) {
 		draw
 	}
 }
-
-/**
- * @param {WebGLRenderingContext} gl
- */
-export function createWorldMatrix(gl, program) {
-	const matWorldUniformLocation = gl.getUniformLocation(program, 'u_matWorld')
-	const matrix = new Float32Array(16)
-	mat4.identity(matrix)
-
-	function apply() {
-		gl.useProgram(program)
-		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.matrix)
-		gl.useProgram(null)
-	}
-
-	return {
-		matrix,
-		apply
-	}
-}

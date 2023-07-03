@@ -6,6 +6,7 @@ import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 import {
 	createCamera,
 	createContext,
+	createCube,
 	createLight,
 	createMaterial,
 	createObject,
@@ -29,6 +30,7 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 const basicShadingProgram = await createProgram(gl, './shader/basic_shading')
 const sphereMappingProgram = await createProgram(gl, './shader/sphere_mapping')
 const skyboxProgram = await createProgram(gl, './shader/skybox')
+const videoProgram = await createProgram(gl, './shader/video')
 const textureShadingProgram = await createProgram(gl, "./shader/texture_shading");
 const minColorFactorUniformLocation = gl.getUniformLocation(textureShadingProgram, 'u_minColorFactor')
 
@@ -37,6 +39,7 @@ const minColorFactorUniformLocation = gl.getUniformLocation(textureShadingProgra
 const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj')
 const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
 const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
+const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj')
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
 skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -54,9 +57,7 @@ light.apply(basicShadingProgram)
 // Textures
 
 let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true, true);
-lime_texture.load(textureShadingProgram, "u_sampler");
-
-const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 1, true, true)
+const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 2, true, true)
 
 // Materials
 
@@ -93,6 +94,7 @@ camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
 camera.apply(textureShadingProgram);
+camera.apply(videoProgram)
 
 // Camera Movement
 
@@ -134,8 +136,9 @@ const ipadWorldMatrix = new Float32Array(16)
 mat4.identity(ipadWorldMatrix)
 mat4.translate(ipadWorldMatrix, ipadWorldMatrix, [0, 0, 0])
 mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [0.1, 0.1, 0.1])
-mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(90), [1, 0, 0])
+mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
 ipad.worldMatrix = ipadWorldMatrix
+ipadScreen.worldMatrix = ipadWorldMatrix
 
 // Render Loop
 
@@ -150,6 +153,7 @@ function render() {
 	camera.apply(sphereMappingProgram)
 	camera.apply(skyboxProgram)
 	camera.apply(textureShadingProgram)
+	camera.apply(videoProgram)
 
 	// Calculate Cam Direction
 	mat3.fromMat4(inverseViewMatrix, camera.viewMatrix)
@@ -171,6 +175,7 @@ function render() {
 
 	// -- Lime
 
+	// lime_texture.load(textureShadingProgram, "u_sampler");
 	// lime.draw(camera);
 
 	gl.useProgram(textureShadingProgram)
@@ -178,6 +183,9 @@ function render() {
 	gl.useProgram(null)
 	ipad_texture.load(textureShadingProgram, 'u_sampler')
 	ipad.draw(camera)
+
+	iPad
+	ipadScreen.draw(camera)
 
 	requestAnimationFrame(render);
 }
