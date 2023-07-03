@@ -46,7 +46,12 @@ export async function createProgram(gl, path) {
 /**
  * @param {WebGLRenderingContext} gl
  */
-export function createTexture(gl, image, textureId, createMipmap) {
+export function createTexture(gl, image, textureId, createMipmap, createAnisotropy) {
+	const ext =
+	gl.getExtension("EXT_texture_filter_anisotropic") ||
+	gl.getExtension("MOZ_EXT_texture_filter_anisotropic") ||
+	gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
+
 	const texture = gl.createTexture();
 
 	update();
@@ -58,6 +63,11 @@ export function createTexture(gl, image, textureId, createMipmap) {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 	} else {
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	}
+
+	if (createAnisotropy) {
+		const max = gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+		gl.texParameterf(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, max);
 	}
 
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

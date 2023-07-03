@@ -50,7 +50,7 @@ light.apply()
 
 // Textures
 
-let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true);
+let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true, true);
 lime_texture.load(textureShadingProgram, "u_sampler");
 
 // Materials
