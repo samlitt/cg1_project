@@ -209,3 +209,18 @@ export function loadImage(path) {
 		image.src = path
 	})
 }
+
+export function loadVideo(path) {
+	return new Promise((resolve, reject) => {
+		const video = document.createElement('video')
+		video.onloadeddata = (e) => resolve(e.target)
+		video.onerror = reject
+		video.src = path
+		video.autoplay = true
+		video.loop = true
+		video.muted = true
+		video.width = 0
+		video.height = 0
+		document.body.appendChild(video)
+	})
+}

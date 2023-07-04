@@ -1,6 +1,6 @@
 'use strict'
 
-import { loadImage } from "./load.js";
+import { loadImage, loadVideo } from "./load.js";
 import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 
 import {
@@ -58,6 +58,7 @@ light.apply(basicShadingProgram)
 
 let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true, true);
 const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 2, true, true)
+const video_texture = createTexture(gl, await loadVideo('./assets/video.mp4'), 3, false, false);
 
 // Materials
 
@@ -136,6 +137,7 @@ const ipadWorldMatrix = new Float32Array(16)
 mat4.identity(ipadWorldMatrix)
 mat4.translate(ipadWorldMatrix, ipadWorldMatrix, [0, 0, 0])
 mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [0.1, 0.1, 0.1])
+mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(90), [0, 0, 1])
 mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
 ipad.worldMatrix = ipadWorldMatrix
 ipadScreen.worldMatrix = ipadWorldMatrix
@@ -184,7 +186,8 @@ function render() {
 	ipad_texture.load(textureShadingProgram, 'u_sampler')
 	ipad.draw(camera)
 
-	iPad
+	video_texture.update()
+	video_texture.load(videoProgram, 'u_texture')
 	ipadScreen.draw(camera)
 
 	requestAnimationFrame(render);
