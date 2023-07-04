@@ -16,6 +16,6 @@
 - [x] use of an environment texture
 - [x] ambient texture reflection on some objects
 - [ ] fog in a complex 3D scene
-- [ ] use of a video texture
+- [x] use of a video texture
 
 **For a particularly good grade, you will be required to implement at least one advanced technique, for which you will need to research the necessary details on your own.**
