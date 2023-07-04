@@ -181,7 +181,7 @@ function render() {
 	// lime.draw(camera);
 
 	gl.useProgram(textureShadingProgram)
-	gl.uniform1f(minColorFactorUniformLocation, 1.0)
+	gl.uniform1f(minColorFactorUniformLocation, 0.5)
 	gl.useProgram(null)
 	ipad_texture.load(textureShadingProgram, 'u_sampler')
 	ipad.draw(camera)
