@@ -10,7 +10,7 @@
 - [x] Splitting up the code in multiple files (espcially shader code as seperate files)
 - [x] simple user interaction of camera and/or objects (eg. via keyboard)
 - [ ] transparent objects
-- [ ] lighting of the scene with more then one light source
+- [x] lighting of the scene with more then one light source
 - [ ] simultaneous use of at least two textures in one object
 - [x] simultaneous use of at least two different shader programs in one scene
 - [x] use of an environment texture
