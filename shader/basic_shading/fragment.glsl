@@ -1,3 +1,5 @@
+#extension GL_EXT_draw_buffers : require
+
 precision mediump float;
 
 varying vec3 v_position;
@@ -55,5 +57,7 @@ void main() {
 	vec3 light2 = calculateLight(u_lights[1], N);
 
 	vec3 lightingColor = emissive + light1 + light2;
-	gl_FragColor = vec4(lightingColor, 1.0);
+	gl_FragData[0] = vec4(lightingColor, 1.0);
+
+	gl_FragData[1] = vec4(lightingColor, 1.0);
 }

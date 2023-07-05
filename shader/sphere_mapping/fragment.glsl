@@ -1,3 +1,5 @@
+#extension GL_EXT_draw_buffers : require
+
 precision mediump float;
 
 varying vec3 v_normal;
@@ -15,5 +17,6 @@ void main() {
 	texCoords.s = -atan(texCoordsDir.z, texCoordsDir.x) / (2.0*pi) + 0.5;
 	texCoords.t = -asin(texCoordsDir.y) / pi + 0.5;
 
-	gl_FragColor = texture2D(u_skybox, texCoords);
+	gl_FragData[0] = texture2D(u_skybox, texCoords);
+	gl_FragData[1] = texture2D(u_skybox, texCoords);
 }

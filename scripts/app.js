@@ -26,14 +26,25 @@ gl.frontFace(gl.CCW);
 gl.cullFace(gl.BACK);
 gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
+const ext = gl.getExtension("WEBGL_draw_buffers");
+
 const mainScene = await createMainScene(gl, canvas)
 const quadScene = await createQuadScene(gl)
 
 const textureWidth = canvas.width
 const textureHeight = canvas.height
-const texture = gl.createTexture()
-gl.activeTexture(gl.TEXTURE31)
-gl.bindTexture(gl.TEXTURE_2D, texture)
+
+const sceneTexture = gl.createTexture()
+gl.bindTexture(gl.TEXTURE_2D, sceneTexture)
+
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureWidth, textureHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+const brightnessTexture = gl.createTexture()
+gl.bindTexture(gl.TEXTURE_2D, brightnessTexture)
 
 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureWidth, textureHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
@@ -43,7 +54,13 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
 const frameBuffer = gl.createFramebuffer()
 gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
-gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0)
+gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, sceneTexture, 0)
+gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, brightnessTexture, 0)
+
+ext.drawBuffersWEBGL([
+	ext.COLOR_ATTACHMENT0_WEBGL, // gl_FragData[0]
+	ext.COLOR_ATTACHMENT1_WEBGL, // gl_FragData[1]
+]);
 
 const depthBuffer = gl.createRenderbuffer()
 gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
@@ -65,7 +82,7 @@ function render() {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 	gl.viewport(0, 0, canvas.width, canvas.height)
 	gl.activeTexture(gl.TEXTURE31)
-	gl.bindTexture(gl.TEXTURE_2D, texture)
+	gl.bindTexture(gl.TEXTURE_2D, brightnessTexture)
 
 	quadScene.render()
 
