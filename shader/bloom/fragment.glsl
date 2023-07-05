@@ -16,8 +16,8 @@ void main()
 	weight[3] = 0.054054;
 	weight[4] = 0.016216;
 
+	// gets size of single texel
 	vec2 tex_offset = 1.0 / u_size;
-	 // gets size of single texel
 	vec3 result = texture2D(u_sampler, v_texCoords).rgb * weight[0]; // current fragment's contribution
 	if(u_horizontal)
 	{
