@@ -1,0 +1,14 @@
+# Blender 3.6.0 MTL File: 'kitchen counter.blend'
+# www.blender.org
+
+newmtl KitchenKnife
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/vincentklingemann/Downloads/cc0-kitchen-knife/textures/KitchenKnifeAlbedo.png
+map_Ks /Users/vincentklingemann/Downloads/cc0-kitchen-knife/source/KitchenKnifeRough.png
+map_Ns /Users/vincentklingemann/Downloads/cc0-kitchen-knife/textures/KitchenKnifeRough.png
+map_refl /Users/vincentklingemann/Downloads/cc0-kitchen-knife/textures/KitchenKnifeMetal.png
+map_Bump -bm 0.300000 /Users/vincentklingemann/Downloads/cc0-kitchen-knife/source/KitchenKnifeNormal.png
