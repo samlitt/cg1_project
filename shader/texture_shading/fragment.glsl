@@ -18,8 +18,6 @@ uniform vec3 u_lightSpecular;
 
 uniform mat4 u_matView;
 
-uniform float u_minColorFactor;
-
 void main() {
   vec3 N = normalize(v_normal);
 
@@ -48,6 +46,5 @@ void main() {
   }
 
   vec3 lightingColor = emissive + ambient + diffuse + specular;
-  lightingColor = mix(vec3(u_minColorFactor), vec3(1.0), lightingColor);
   gl_FragColor = vec4(lightingColor * textureColor.rgb, 1.0);
 }

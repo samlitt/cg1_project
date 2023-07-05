@@ -332,6 +332,20 @@ export async function createObjectWithMaterials(gl, program, objPath, mtlPath) {
 
 	return {
 		objects,
+		material: {
+			set emissive(newValue) {
+				objects.forEach(o => o.material.emission = newValue)
+			},
+			set ambient(newValue) {
+				objects.forEach(o => o.material.ambient = newValue)
+			},
+			set diffuse(newValue) {
+				objects.forEach(o => o.material.diffuse = newValue)
+			},
+			set shininess(newValue) {
+				objects.forEach(o => o.material.shininess = newValue)
+			}
+		},
 		set worldMatrix(newValue) {
 			objects.forEach(o => o.worldMatrix = newValue)
 		},

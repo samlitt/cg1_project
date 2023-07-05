@@ -32,13 +32,16 @@ const sphereMappingProgram = await createProgram(gl, './shader/sphere_mapping')
 const skyboxProgram = await createProgram(gl, './shader/skybox')
 const videoProgram = await createProgram(gl, './shader/video')
 const textureShadingProgram = await createProgram(gl, "./shader/texture_shading");
-const minColorFactorUniformLocation = gl.getUniformLocation(textureShadingProgram, 'u_minColorFactor')
 
 // Objects
 
 const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj')
 const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
+
 const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
+ipad.material.ambient = [0.2, 0.2, 0.2]
+ipad.material.diffuse = [0.8, 0.8, 0.8]
+
 const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj')
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
 skybox.texture.load(sphereMappingProgram, 'u_skybox')
@@ -47,7 +50,7 @@ skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
 const light = createLight(
 gl,
-[0.0, 0.0, 1.0, 0.0],
+[0.0, 0.0, -1.0, 0.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0]);
@@ -101,7 +104,7 @@ camera.apply(videoProgram)
 
 const originalViewMatrix = new Float32Array(camera.viewMatrix)
 
-const rotationFactor = Math.PI / 256
+const rotationFactor = Math.PI / 128
 const maxRotation = 2 * Math.PI // Quarter circle
 let rotation = 0
 
@@ -180,9 +183,8 @@ function render() {
 	// lime_texture.load(textureShadingProgram, "u_sampler");
 	// lime.draw(camera);
 
-	gl.useProgram(textureShadingProgram)
-	gl.uniform1f(minColorFactorUniformLocation, 0.5)
-	gl.useProgram(null)
+	// -- iPad
+
 	ipad_texture.load(textureShadingProgram, 'u_sampler')
 	ipad.draw(camera)
 
