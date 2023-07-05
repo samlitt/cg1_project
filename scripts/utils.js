@@ -1,4 +1,4 @@
-import { loadShader, loadObj, loadImage } from "./load.js"
+import { loadShader, loadObj, loadImage, loadObjWithMaterials, loadMtl } from "./load.js"
 import { mat4, mat3 } from './matrix.js'
 
 export function createContext(canvasId) {
@@ -103,13 +103,14 @@ export function createTexture(gl, image, textureId, createMipmap, createAnisotro
 /**
  * @param {WebGLRenderingContext} gl
  */
-export function createLight(gl, program, pos, ambient, diffuse, specular) {
-	const posUniformLocation = gl.getUniformLocation(program, 'u_lightPos');
-	const ambientUniformLocation = gl.getUniformLocation(program, 'u_lightAmbient');
-	const diffuseUniformLocation = gl.getUniformLocation(program, 'u_lightDiffuse');
-	const specularUniformLocation = gl.getUniformLocation(program, 'u_lightSpecular');
+export function createLight(gl, pos, ambient, diffuse, specular) {
+	
+	function apply(program) {
+		const posUniformLocation = gl.getUniformLocation(program, 'u_lightPos');
+		const ambientUniformLocation = gl.getUniformLocation(program, 'u_lightAmbient');
+		const diffuseUniformLocation = gl.getUniformLocation(program, 'u_lightDiffuse');
+		const specularUniformLocation = gl.getUniformLocation(program, 'u_lightSpecular');
 
-	function apply() {
 		gl.useProgram(program);
 
 		gl.uniform4fv(posUniformLocation, pos);
@@ -138,17 +139,22 @@ export function createMaterial(gl, program, emission, ambient, diffuse, specular
 	function apply() {
 		gl.useProgram(program)
 
-		gl.uniform3fv(emissionUniformLocation, emission);
-		gl.uniform3fv(ambientUniformLocation, ambient);
-		gl.uniform3fv(diffuseUniformLocation, diffuse);
-		gl.uniform3fv(specularUniformLocation, specular);
-		gl.uniform1f(shininessUniformLocation, shininess * 4);
+		gl.uniform3fv(emissionUniformLocation, this.emission);
+		gl.uniform3fv(ambientUniformLocation, this.ambient);
+		gl.uniform3fv(diffuseUniformLocation, this.diffuse);
+		gl.uniform3fv(specularUniformLocation, this.specular);
+		gl.uniform1f(shininessUniformLocation, this.shininess * 4);
 
 		gl.useProgram(null)
 	}
 
 	return {
-		apply
+		apply,
+		emission,
+		ambient,
+		diffuse,
+		specular,
+		shininess
 	}
 }
 
@@ -195,6 +201,12 @@ export function createCamera(gl) {
  * @param {WebGLRenderingContext} gl
  */
 export async function createObject(gl, program, objPath) {
+	const vertices = await loadObj(objPath)
+
+	return createObjectFromVertices(gl, program, vertices)
+}
+
+function createObjectFromVertices(gl, program, vertices) {
 	const positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
 	const texCoordsAttributeLocation = gl.getAttribLocation(program, 'a_texCoords')
 	const normalAttributeLocation = gl.getAttribLocation(program, 'a_normal')
@@ -208,8 +220,6 @@ export async function createObject(gl, program, objPath) {
 	const worldViewMatrix = new Float32Array(16)
 	const worldNormalMatrix = new Float32Array(9)
 	const viewNormalMatrix = new Float32Array(9)
-
-	const vertices = await loadObj(objPath)
 
 	const vbo = gl.createBuffer()
 	gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
@@ -305,6 +315,43 @@ export async function createObject(gl, program, objPath) {
 		material: null,
 		worldMatrix,
 		draw
+	}
+}
+
+export async function createObjectWithMaterials(gl, program, objPath, mtlPath) {
+	const meshes = await loadObjWithMaterials(objPath)
+	const materials = await loadMtl(mtlPath)
+
+	const objects = meshes.map(mesh => {
+		const object = createObjectFromVertices(gl, program, mesh.vbo)
+		const material = materials[mesh.material]
+		object.material = createMaterial(gl, program, material.emissive, material.ambient, material.diffuse, material.specular, material.shininess)
+
+		return object
+	})
+
+	return {
+		objects,
+		material: {
+			set emissive(newValue) {
+				objects.forEach(o => o.material.emission = newValue)
+			},
+			set ambient(newValue) {
+				objects.forEach(o => o.material.ambient = newValue)
+			},
+			set diffuse(newValue) {
+				objects.forEach(o => o.material.diffuse = newValue)
+			},
+			set shininess(newValue) {
+				objects.forEach(o => o.material.shininess = newValue)
+			}
+		},
+		set worldMatrix(newValue) {
+			objects.forEach(o => o.worldMatrix = newValue)
+		},
+		draw(camera) {
+			objects.forEach(o => o.draw(camera))
+		}
 	}
 }
 
@@ -660,25 +707,5 @@ export function createCube(gl, program, colors) {
 
 	return {
 		draw
-	}
-}
-
-/**
- * @param {WebGLRenderingContext} gl
- */
-export function createWorldMatrix(gl, program) {
-	const matWorldUniformLocation = gl.getUniformLocation(program, 'u_matWorld')
-	const matrix = new Float32Array(16)
-	mat4.identity(matrix)
-
-	function apply() {
-		gl.useProgram(program)
-		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.matrix)
-		gl.useProgram(null)
-	}
-
-	return {
-		matrix,
-		apply
 	}
 }

@@ -1,17 +1,19 @@
 'use strict'
 
+import { loadImage, loadVideo } from "./load.js";
 import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
-import { loadImage } from "./load.js";
 
 import {
 	createCamera,
 	createContext,
+	createCube,
 	createLight,
 	createMaterial,
 	createObject,
+	createObjectWithMaterials,
 	createProgram,
-	createTexture,
-	createSkyboxSphere
+	createSkyboxSphere,
+	createTexture
 } from "./utils.js";
 
 const { gl, canvas } = createContext('canvas');
@@ -28,12 +30,19 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 const basicShadingProgram = await createProgram(gl, './shader/basic_shading')
 const sphereMappingProgram = await createProgram(gl, './shader/sphere_mapping')
 const skyboxProgram = await createProgram(gl, './shader/skybox')
+const videoProgram = await createProgram(gl, './shader/video')
 const textureShadingProgram = await createProgram(gl, "./shader/texture_shading");
 
 // Objects
 
 const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj')
 const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
+
+const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
+ipad.material.ambient = [0.2, 0.2, 0.2]
+ipad.material.diffuse = [0.8, 0.8, 0.8]
+
+const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj')
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
 skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -41,31 +50,44 @@ skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
 const light = createLight(
 gl,
-textureShadingProgram,
-[1.0, 1.0, 1.0, 0.0],
+[0.0, 0.0, -1.0, 0.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0],
 [1.0, 1.0, 1.0]);
-light.apply()
+light.apply(textureShadingProgram)
+light.apply(basicShadingProgram)
 
 // Textures
 
 let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true, true);
-lime_texture.load(textureShadingProgram, "u_sampler");
+const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 2, true, true)
+const video_texture = createTexture(gl, await loadVideo('./assets/video.mp4'), 3, false, false);
 
 // Materials
 
-const material = createMaterial(
+const limeMaterial = createMaterial(
 	gl,
 	textureShadingProgram,
-	[0.0, 0.0, 0.0], 		// emissive
+	[0.0, 0.0, 0.0], // emissive
 	[0.4, 0.4, 0.4], // ambient
 	[0.4, 0.4, 0.4], // diffuse
 	[0.5, 0.5, 0.5], // specular
-	1.0										// shininess
+	1.0				  // shininess
 );
 
-lime.material = material;
+lime.material = limeMaterial;
+
+const ipadMaterial = createMaterial(
+	gl,
+	textureShadingProgram,
+	[0.0, 0.0, 0.0], // emissive
+	[0.4, 0.4, 0.4], // ambient
+	[0.4, 0.4, 0.4], // diffuse
+	[0.5, 0.5, 0.5], // specular
+	18.0				  // shininess
+);
+
+ipad.material = ipadMaterial
 
 // Camera
 
@@ -76,18 +98,13 @@ camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
 camera.apply(textureShadingProgram);
-
-// Variables
-
-
-const inverseViewMatrix = new Float32Array(9)
-const camDir = new Float32Array(3)
+camera.apply(videoProgram)
 
 // Camera Movement
 
 const originalViewMatrix = new Float32Array(camera.viewMatrix)
 
-const rotationFactor = Math.PI / 256
+const rotationFactor = Math.PI / 128
 const maxRotation = 2 * Math.PI // Quarter circle
 let rotation = 0
 
@@ -114,6 +131,20 @@ window.addEventListener('keydown', (event) => {
 	}
 })
 
+// Variables
+
+const inverseViewMatrix = new Float32Array(9)
+const camDir = new Float32Array(3)
+
+const ipadWorldMatrix = new Float32Array(16)
+mat4.identity(ipadWorldMatrix)
+mat4.translate(ipadWorldMatrix, ipadWorldMatrix, [0, 0, 0])
+mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [0.1, 0.1, 0.1])
+mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(90), [0, 0, 1])
+mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
+ipad.worldMatrix = ipadWorldMatrix
+ipadScreen.worldMatrix = ipadWorldMatrix
+
 // Render Loop
 
 function render() {
@@ -127,6 +158,7 @@ function render() {
 	camera.apply(sphereMappingProgram)
 	camera.apply(skyboxProgram)
 	camera.apply(textureShadingProgram)
+	camera.apply(videoProgram)
 
 	// Calculate Cam Direction
 	mat3.fromMat4(inverseViewMatrix, camera.viewMatrix)
@@ -144,11 +176,21 @@ function render() {
 
 	// -- Faucet
 
-	faucet.draw(camera)
+	// faucet.draw(camera)
 
 	// -- Lime
 
-	lime.draw(camera);
+	// lime_texture.load(textureShadingProgram, "u_sampler");
+	// lime.draw(camera);
+
+	// -- iPad
+
+	ipad_texture.load(textureShadingProgram, 'u_sampler')
+	ipad.draw(camera)
+
+	video_texture.update()
+	video_texture.load(videoProgram, 'u_texture')
+	ipadScreen.draw(camera)
 
 	requestAnimationFrame(render);
 }

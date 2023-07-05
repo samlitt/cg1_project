@@ -15,6 +15,7 @@ uniform vec4 u_lightPos;
 uniform vec3 u_lightAmbient;
 uniform vec3 u_lightDiffuse;
 uniform vec3 u_lightSpecular;
+
 uniform mat4 u_matView;
 
 void main() {
@@ -45,5 +46,5 @@ void main() {
   }
 
   vec3 lightingColor = emissive + ambient + diffuse + specular;
-  gl_FragColor = vec4(textureColor.rgb * lightingColor, 1.0);
+  gl_FragColor = vec4(lightingColor * textureColor.rgb, 1.0);
 }

@@ -1,0 +1,70 @@
+newmtl blitz01SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd texture.tif
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 18.00
+newmtl case01SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd texture.tif
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 18.00
+newmtl case01SG1
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd texture.tif
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 18.00
+newmtl case01SG2
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.00 0.00 0.00
+Ns 0.00
+newmtl headphones_jack01SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd texture.tif
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 18.00
+newmtl headphones_jack01SG1
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.00 0.00 0.00
+Ns 0.00
+newmtl power_button01SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd texture.tif
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 18.00
+newmtl power_button01SG1
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd texture.tif
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 18.00
