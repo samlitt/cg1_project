@@ -86,6 +86,9 @@ function render() {
 	gl.viewport(0, 0, canvas.width, canvas.height)
 
 	gl.activeTexture(gl.TEXTURE0)
+	gl.bindTexture(gl.TEXTURE_2D, sceneTexture)
+
+	gl.activeTexture(gl.TEXTURE1)
 	gl.bindTexture(gl.TEXTURE_2D, blurredTexture)
 
 	finalScene.render()
@@ -167,9 +170,12 @@ async function createBlurScene(gl) {
 async function createFinalScene(gl) {
 	const program = await createProgram(gl, './shader/final')
 
-	const textureUniformLocation = gl.getUniformLocation(program, 'u_sceneSampler')
+	const sceneTextureUniformLocation = gl.getUniformLocation(program, 'u_sceneSampler')
+	const blurTextureUniformLocation = gl.getUniformLocation(program, 'u_blurSampler')
+	
 	gl.useProgram(program)
-	gl.uniform1i(textureUniformLocation, 0)
+	gl.uniform1i(sceneTextureUniformLocation, 0)
+	gl.uniform1i(blurTextureUniformLocation, 1)
 	gl.useProgram(null)
 
 	const quad = createQuad(gl, program)
