@@ -28,11 +28,12 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
 const ext = gl.getExtension("WEBGL_draw_buffers");
 
-const mainScene = await createMainScene(gl, canvas)
-const quadScene = await createQuadScene(gl)
-
 const textureWidth = canvas.width
 const textureHeight = canvas.height
+
+const mainScene = await createMainScene(gl, canvas)
+const blurScene = await createBlurScene(gl)
+const finalScene = await createFinalScene(gl)
 
 const sceneTexture = gl.createTexture()
 gl.bindTexture(gl.TEXTURE_2D, sceneTexture)
@@ -52,8 +53,8 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-const frameBuffer = gl.createFramebuffer()
-gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
+const framebuffer = gl.createFramebuffer()
+gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
 gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT0_WEBGL, gl.TEXTURE_2D, sceneTexture, 0)
 gl.framebufferTexture2D(gl.FRAMEBUFFER, ext.COLOR_ATTACHMENT1_WEBGL, gl.TEXTURE_2D, brightnessTexture, 0)
 
@@ -74,17 +75,20 @@ gl.bindRenderbuffer(gl.RENDERBUFFER, null)
 
 function render() {
 
-	gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer)
+	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
 	gl.viewport(0, 0, textureWidth, textureHeight)
 
 	mainScene.render()
 
+	const blurredTexture = blurScene.blur(brightnessTexture)
+
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 	gl.viewport(0, 0, canvas.width, canvas.height)
-	gl.activeTexture(gl.TEXTURE31)
-	gl.bindTexture(gl.TEXTURE_2D, brightnessTexture)
 
-	quadScene.render()
+	gl.activeTexture(gl.TEXTURE0)
+	gl.bindTexture(gl.TEXTURE_2D, blurredTexture)
+
+	finalScene.render()
 
 	gl.bindTexture(gl.TEXTURE_2D, null)
 
@@ -96,14 +100,92 @@ requestAnimationFrame(render)
 /**
  * @param {WebGLRenderingContext} gl 
  */
-async function createQuadScene(gl) {
+async function createBlurScene(gl) {
+
+	const framebuffer1 = gl.createFramebuffer()
+	const framebuffer2 = gl.createFramebuffer()
+
+	const texture1 = gl.createTexture()
+	const texture2 = gl.createTexture()
+
+	const setupBuffer = (framebuffer, texture) => {
+		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
+		gl.bindTexture(gl.TEXTURE_2D, texture)
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureWidth, textureHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0)
+	}
+
+	setupBuffer(framebuffer1, texture1)
+	setupBuffer(framebuffer2, texture2)
+
+	const program = await createProgram(gl, './shader/bloom')
+	const horizontalUniformLocation = gl.getUniformLocation(program, 'u_horizontal')
+	const sizeUniformLocation = gl.getUniformLocation(program, 'u_size')
+
+	gl.useProgram(program)
+	gl.uniform2f(sizeUniformLocation, textureWidth, textureHeight)
+	gl.useProgram(null)
+
+	const quad = createQuad(gl, program)
+
+	function blur(originalTexture) {
+		gl.activeTexture(gl.TEXTURE0)
+
+		let horizontal = true
+		for (let i = 0; i < 10; i++) {
+			gl.useProgram(program)
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, horizontal ? framebuffer1 : framebuffer2)
+			gl.bindTexture(gl.TEXTURE_2D, i === 0 ? originalTexture : horizontal ? texture2 : texture1)
+			gl.uniform1i(horizontalUniformLocation, horizontal);
+
+			quad.draw()
+
+			horizontal = !horizontal
+		}
+
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null)
+		gl.bindTexture(gl.TEXTURE_2D, null)
+
+		gl.useProgram(null)
+
+		return horizontal ? texture2 : texture1
+	}
+
+	return {
+		blur
+	}
+}
+
+/**
+ * @param {WebGLRenderingContext} gl 
+ */
+async function createFinalScene(gl) {
 	const program = await createProgram(gl, './shader/final')
 
 	const textureUniformLocation = gl.getUniformLocation(program, 'u_sceneSampler')
 	gl.useProgram(program)
-	gl.uniform1i(textureUniformLocation, 31)
+	gl.uniform1i(textureUniformLocation, 0)
 	gl.useProgram(null)
 
+	const quad = createQuad(gl, program)
+
+	function render() {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+		quad.draw()
+	}
+
+	return {
+		render
+	}
+}
+
+function createQuad(gl, program) {
 	const positionAttributeLocation = gl.getAttribLocation(program, 'a_position')
 	const texCoordsAttributeLocation = gl.getAttribLocation(program, 'a_texCoords')
 
@@ -119,9 +201,7 @@ async function createQuadScene(gl) {
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW)
 	gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
-	function render() {
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
+	function draw() {
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
 
 		gl.vertexAttribPointer(
@@ -156,6 +236,6 @@ async function createQuadScene(gl) {
 	}
 
 	return {
-		render
+		draw
 	}
 }
