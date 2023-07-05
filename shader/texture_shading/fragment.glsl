@@ -52,15 +52,20 @@ vec3 calculateLight(Light light, vec3 N) {
 }
 
 void main() {
-  vec3 N = normalize(v_normal);
+	vec3 N = normalize(v_normal);
 
-  vec4 textureColor = texture2D(u_sampler, v_texCoords);
-  vec3 emissive = u_mtlEmission;
-  
-  vec3 light1 = calculateLight(u_lights[0], N);
+	vec4 textureColor = texture2D(u_sampler, v_texCoords);
+	vec3 emissive = u_mtlEmission;
+
+	vec3 light1 = calculateLight(u_lights[0], N);
 	vec3 light2 = calculateLight(u_lights[1], N);
 
-  vec3 lightingColor = emissive + light1 + light2;
-  gl_FragData[0] = vec4(lightingColor * textureColor.rgb, 1.0);
-  gl_FragData[1] = vec4(lightingColor * textureColor.rgb, 1.0);
+	vec3 lightingColor = emissive + light1 + light2;
+	gl_FragData[0] = vec4(lightingColor * textureColor.rgb, 1.0);
+
+  	float brightness = dot(gl_FragData[0].rgb, vec3(0.2126, 0.7152, 0.0722));
+   if(brightness > 0.8)
+   	gl_FragData[1] = vec4(gl_FragData[0].rgb, 1.0);
+   else
+   	gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
 }
