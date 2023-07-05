@@ -119,9 +119,10 @@ lime.material = limeMaterial;
 
 // Camera
 
-const camera = createCamera(gl)
-
-camera.configure([2, 2.0, 1.2], [-1, 1, -1], [0.0, 1.0, 0.0], toRadian(45), canvas.width / canvas.height)
+const cameraEye = [2.0, 2.0, 1.2]
+const cameraLook = [-1, 1, -1]
+const camera = createCamera(gl, toRadian(45), canvas.width / canvas.height)
+camera.set(cameraEye, cameraLook, [0.0, 1.0, 0.0])
 camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
@@ -130,7 +131,8 @@ camera.apply(videoProgram)
 
 // Camera Movement
 
-const originalViewMatrix = new Float32Array(camera.viewMatrix)
+const cameraPos = [0.0, 0.0, 0.0]
+const cameraDir = [0.0, 0.0, 0.0]
 
 const rotationFactor = Math.PI / 128
 const maxRotation = 2 * Math.PI // Quarter circle
@@ -175,7 +177,7 @@ mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
 
 const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 teapot1.material = basicMaterial
-mat4.translate(teapot1.worldMatrix, teapot1.worldMatrix, [1, 0, 2])
+mat4.translate(teapot1.worldMatrix, teapot1.worldMatrix, cameraLook)
 mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.3, 0.3, 0.3])
 
 const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
@@ -215,8 +217,12 @@ function render() {
 
 	// -- Camera
 
-	mat4.translate(camera.viewMatrix, originalViewMatrix, [0, 0, -zoom])
-	mat4.rotate(camera.viewMatrix, camera.viewMatrix, rotation, [0, 1, 0])
+	vec3.rotateY(cameraPos, cameraEye, cameraLook, -rotation)
+	vec3.sub(cameraDir, cameraPos, cameraLook)
+	vec3.normalize(cameraDir)
+	vec3.translate(cameraPos, cameraPos, zoom, cameraDir)
+
+	camera.set(cameraPos, cameraLook, [0.0, 1.0, 0.0])
 	camera.apply(basicShadingProgram)
 	camera.apply(sphereMappingProgram)
 	camera.apply(skyboxProgram)
@@ -274,6 +280,8 @@ function render() {
 
 
 	// -- Test Teapots
+
+	teapot1.draw(camera)
 
 	requestAnimationFrame(render);
 }

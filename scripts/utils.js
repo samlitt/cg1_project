@@ -183,15 +183,15 @@ export function createMaterial(gl, program, emission, ambient, diffuse, specular
 /**
  * @param {WebGLRenderingContext} gl
  */
-export function createCamera(gl) {
+export function createCamera(gl, fovy, aspect) {
 	const viewMatrix = new Float32Array(16)
 	const projMatrix = new Float32Array(16)
+	mat4.perspective(projMatrix, fovy, aspect, 0.1, 1000.0);
 
 	const viewNormalMatrix = new Float32Array(9)
 
-	function configure(eye, look, up, fovy, aspect) {
+	function set(eye, look, up) {
 		mat4.lookAt(viewMatrix, eye, look, up)
-		mat4.perspective(projMatrix, fovy, aspect, 0.1, 1000.0);
 	}
 
 	function apply(program) {
@@ -214,7 +214,7 @@ export function createCamera(gl) {
 	return {
 		viewMatrix,
 		projMatrix,
-		configure,
+		set,
 		apply
 	}
 }
