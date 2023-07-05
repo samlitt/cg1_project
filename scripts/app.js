@@ -6,8 +6,8 @@ import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 import {
 	createCamera,
 	createContext,
-	createCube,
 	createLight,
+	createLightGroup,
 	createMaterial,
 	createObject,
 	createObjectWithMaterials,
@@ -48,14 +48,25 @@ skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
 // Lights
 
-const light = createLight(
-gl,
-[0.0, 0.0, -1.0, 0.0],
-[1.0, 1.0, 1.0],
-[1.0, 1.0, 1.0],
-[1.0, 1.0, 1.0]);
-light.apply(textureShadingProgram)
-light.apply(basicShadingProgram)
+const mainLight = createLight(
+	gl,
+	[0.0, 0.0, -1.0, 0.0],
+	[1.0, 1.0, 1.0],
+	[0.0, 0.0, 1.0],
+	[0.0, 0.0, 1.0]
+);
+
+const pointLight = createLight(
+	gl,
+	[-1, 0, 3, 1.0],
+	[1.0, 1.0, 1.0],
+	[1.0, 0.0, 0.0],
+	[1.0, 0.0, 0.0]
+);
+
+const lightGroup = createLightGroup([mainLight, pointLight])
+lightGroup.apply(basicShadingProgram)
+lightGroup.apply(textureShadingProgram)
 
 // Textures
 
@@ -64,6 +75,16 @@ const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 2, tr
 const video_texture = createTexture(gl, await loadVideo('./assets/video.mp4'), 3, false, false);
 
 // Materials
+
+const basicMaterial = createMaterial(
+	gl,
+	basicShadingProgram,
+	[0.0, 0.0, 0.0],
+	[0.1, 0.1, 0.1],
+	[0.8, 0.8, 0.8],
+	[1.0, 1.0, 1.0],
+	20.0
+)
 
 const limeMaterial = createMaterial(
 	gl,
@@ -76,18 +97,6 @@ const limeMaterial = createMaterial(
 );
 
 lime.material = limeMaterial;
-
-const ipadMaterial = createMaterial(
-	gl,
-	textureShadingProgram,
-	[0.0, 0.0, 0.0], // emissive
-	[0.4, 0.4, 0.4], // ambient
-	[0.4, 0.4, 0.4], // diffuse
-	[0.5, 0.5, 0.5], // specular
-	18.0				  // shininess
-);
-
-ipad.material = ipadMaterial
 
 // Camera
 
@@ -145,6 +154,27 @@ mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
 ipad.worldMatrix = ipadWorldMatrix
 ipadScreen.worldMatrix = ipadWorldMatrix
 
+const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+teapot1.material = basicMaterial
+mat4.translate(teapot1.worldMatrix, teapot1.worldMatrix, [1, 0, 2])
+mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.3, 0.3, 0.3])
+
+const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+teapot2.material = basicMaterial
+mat4.translate(teapot2.worldMatrix, teapot2.worldMatrix, [-3, 0, 5])
+mat4.scale(teapot2.worldMatrix, teapot2.worldMatrix, [0.3, 0.3, 0.3])
+
+const teapot3 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+teapot3.material = basicMaterial
+mat4.translate(teapot3.worldMatrix, teapot3.worldMatrix, [-2, 1, 0])
+mat4.scale(teapot3.worldMatrix, teapot3.worldMatrix, [0.3, 0.3, 0.3])
+
+const teapotCenter = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+teapotCenter.material = basicMaterial
+mat4.translate(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [-1, 0, 3])
+mat4.scale(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [0.3, 0.3, 0.3])
+
+
 // Render Loop
 
 function render() {
@@ -172,7 +202,7 @@ function render() {
 
 	// -- Skybox
 
-	skybox.draw()
+	// skybox.draw()
 
 	// -- Faucet
 
@@ -180,8 +210,8 @@ function render() {
 
 	// -- Lime
 
-	// lime_texture.load(textureShadingProgram, "u_sampler");
-	// lime.draw(camera);
+	lime_texture.load(textureShadingProgram, "u_sampler");
+	lime.draw(camera);
 
 	// -- iPad
 
@@ -191,6 +221,13 @@ function render() {
 	video_texture.update()
 	video_texture.load(videoProgram, 'u_texture')
 	ipadScreen.draw(camera)
+
+	// -- Test Teapots
+
+	teapot1.draw(camera)
+	teapot2.draw(camera)
+	teapot3.draw(camera)
+	teapotCenter.draw(camera)
 
 	requestAnimationFrame(render);
 }

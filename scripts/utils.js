@@ -106,10 +106,10 @@ export function createTexture(gl, image, textureId, createMipmap, createAnisotro
 export function createLight(gl, pos, ambient, diffuse, specular) {
 	
 	function apply(program) {
-		const posUniformLocation = gl.getUniformLocation(program, 'u_lightPos');
-		const ambientUniformLocation = gl.getUniformLocation(program, 'u_lightAmbient');
-		const diffuseUniformLocation = gl.getUniformLocation(program, 'u_lightDiffuse');
-		const specularUniformLocation = gl.getUniformLocation(program, 'u_lightSpecular');
+		const posUniformLocation = gl.getUniformLocation(program, this.posName);
+		const ambientUniformLocation = gl.getUniformLocation(program, this.ambientName);
+		const diffuseUniformLocation = gl.getUniformLocation(program, this.diffuseName);
+		const specularUniformLocation = gl.getUniformLocation(program, this.specularName);
 
 		gl.useProgram(program);
 
@@ -122,6 +122,28 @@ export function createLight(gl, pos, ambient, diffuse, specular) {
 	}
 
 	return {
+		apply,
+		posName: 'u_lights[0].pos',
+		ambientName: 'u_lights[0].ambient',
+		diffuseName: 'u_lights[0].diffuse',
+		specularName: 'u_lights[0].specular',
+	}
+}
+
+export function createLightGroup(lights) {
+	function apply(program) {
+		for (const [index, light] of this.lights.entries()) {
+			light.posName = `u_lights[${index}].pos`
+			light.ambientName = `u_lights[${index}].ambient`
+			light.diffuseName = `u_lights[${index}].diffuse`
+			light.specularName = `u_lights[${index}].specular`
+
+			light.apply(program)
+		}
+	}
+	
+	return {
+		lights,
 		apply
 	}
 }
@@ -668,6 +690,11 @@ export function createCube(gl, program, colors) {
 	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
+	const matWorldUniformLocation = gl.getUniformLocation(program, 'u_matWorld')
+
+	const worldMatrix = new Float32Array(16)
+	mat4.identity(worldMatrix)
+
 	function draw() {
 		gl.bindBuffer(gl.ARRAY_BUFFER, vbo)
 
@@ -696,6 +723,10 @@ export function createCube(gl, program, colors) {
 
 		gl.useProgram(program)
 
+		if (this.worldMatrix) {
+			gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.worldMatrix)
+		}
+
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo)
 		gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null)
@@ -706,6 +737,7 @@ export function createCube(gl, program, colors) {
 	}
 
 	return {
-		draw
+		draw,
+		worldMatrix
 	}
 }
