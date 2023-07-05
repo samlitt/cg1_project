@@ -566,9 +566,13 @@ export async function createSkybox(gl, program, cubemapTexture) {
  * @param {WebGLRenderingContext} gl
  */
 export async function createSkyboxSphere(gl, program, spherePath, texturePath) {
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+
 	const sphere = await createObject(gl, program, spherePath)
 	const image = await loadImage(texturePath)
 	const texture = createTexture(gl, image, 0, false)
+
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
 	function draw() {
 		gl.disable(gl.DEPTH_TEST)

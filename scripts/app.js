@@ -202,7 +202,7 @@ function render() {
 
 	// -- Skybox
 
-	// skybox.draw()
+	skybox.draw()
 
 	// -- Faucet
 
