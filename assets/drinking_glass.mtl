@@ -1,0 +1,12 @@
+# Blender MTL File: 'kitchen counter.blend'
+# Material Count: 1
+
+newmtl drinking_glass
+Ns 73.995260
+Ka 1.000000 1.000000 1.000000
+Kd 0.441422 1.000000 0.752680
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
