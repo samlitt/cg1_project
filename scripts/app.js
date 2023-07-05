@@ -6,7 +6,6 @@ import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 import {
 	createCamera,
 	createContext,
-	createCube,
 	createLight,
 	createLightGroup,
 	createMaterial,
@@ -39,9 +38,9 @@ const textureShadingProgram = await createProgram(gl, "./shader/texture_shading"
 const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj')
 const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
 
-// const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
-// ipad.material.ambient = [0.2, 0.2, 0.2]
-// ipad.material.diffuse = [0.8, 0.8, 0.8]
+const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
+ipad.material.ambient = [0.2, 0.2, 0.2]
+ipad.material.diffuse = [0.8, 0.8, 0.8]
 
 const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj')
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
@@ -72,8 +71,8 @@ lightGroup.apply(textureShadingProgram)
 // Textures
 
 let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true, true);
-// const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 2, true, true)
-// const video_texture = createTexture(gl, await loadVideo('./assets/video.mp4'), 3, false, false);
+const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 2, true, true)
+const video_texture = createTexture(gl, await loadVideo('./assets/video.mp4'), 3, false, false);
 
 // Materials
 
@@ -152,9 +151,8 @@ mat4.translate(ipadWorldMatrix, ipadWorldMatrix, [0, 0, 0])
 mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [0.1, 0.1, 0.1])
 mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(90), [0, 0, 1])
 mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
-// ipad.worldMatrix = ipadWorldMatrix
+ipad.worldMatrix = ipadWorldMatrix
 ipadScreen.worldMatrix = ipadWorldMatrix
-
 
 const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 teapot1.material = basicMaterial
@@ -217,12 +215,14 @@ function render() {
 
 	// -- iPad
 
-	// ipad_texture.load(textureShadingProgram, 'u_sampler')
-	// ipad.draw(camera)
+	ipad_texture.load(textureShadingProgram, 'u_sampler')
+	ipad.draw(camera)
 
-	// video_texture.update()
-	// video_texture.load(videoProgram, 'u_texture')
-	// ipadScreen.draw(camera)
+	video_texture.update()
+	video_texture.load(videoProgram, 'u_texture')
+	ipadScreen.draw(camera)
+
+	// -- Test Teapots
 
 	teapot1.draw(camera)
 	teapot2.draw(camera)
