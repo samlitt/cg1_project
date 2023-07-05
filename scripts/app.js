@@ -73,6 +73,8 @@ gl.bindTexture(gl.TEXTURE_2D, null)
 gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 gl.bindRenderbuffer(gl.RENDERBUFFER, null)
 
+let blurredTexture
+
 function render() {
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
@@ -80,7 +82,7 @@ function render() {
 
 	mainScene.render()
 
-	const blurredTexture = blurScene.blur(brightnessTexture)
+	blurredTexture = blurScene.blur(brightnessTexture)
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null)
 	gl.viewport(0, 0, canvas.width, canvas.height)
