@@ -3,7 +3,6 @@ import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 
 import {
 	createCamera,
-	createContext,
 	createLight,
 	createLightGroup,
 	createMaterial,

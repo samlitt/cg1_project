@@ -1,20 +1,10 @@
 'use strict'
 
-import { loadImage, loadVideo } from "./load.js";
 import { createMainScene } from "./main_scene.js";
-import { mat3, mat4, toRadian, vec3 } from "./matrix.js";
 
 import {
-	createCamera,
 	createContext,
-	createLight,
-	createLightGroup,
-	createMaterial,
-	createObject,
-	createObjectWithMaterials,
-	createProgram,
-	createSkyboxSphere,
-	createTexture
+	createProgram
 } from "./utils.js";
 
 const { gl, canvas } = createContext('canvas');
