@@ -40,7 +40,7 @@ vec3 calculateLight(Light light, vec3 N) {
 	vec3 specular = vec3(0.0);
 	float specLight = pow(max(dot(H, N), 0.0), u_mtlShininess);
 	if (specLight > 0.0) {
-		specular = specLight * u_mtlSpecular * light.diffuse;
+		specular = specLight * u_mtlSpecular * light.specular;
 	}
 
 	return (ambient + diffuse + specular);
