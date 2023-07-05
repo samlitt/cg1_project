@@ -97,6 +97,7 @@ export function createTexture(gl, image, textureId, createMipmap, createAnisotro
 	return {
 		update,
 		load,
+		texture
 	}
 }
 
@@ -572,6 +573,11 @@ export async function createSkyboxSphere(gl, program, spherePath, texturePath) {
 	const image = await loadImage(texturePath)
 	const texture = createTexture(gl, image, 0, false)
 
+	gl.bindTexture(gl.TEXTURE_2D, texture.texture)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+	gl.bindTexture(gl.TEXTURE_2D, null)
+
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
 	function draw() {
@@ -587,7 +593,8 @@ export async function createSkyboxSphere(gl, program, spherePath, texturePath) {
 
 	return {
 		texture,
-		draw
+		draw,
+		sphere
 	}
 }
 

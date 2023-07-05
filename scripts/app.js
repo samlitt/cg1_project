@@ -43,6 +43,7 @@ ipad.material.diffuse = [0.8, 0.8, 0.8]
 
 const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj')
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
+mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(180), [0, 1, 0])
 
 const counter_base = await createObjectWithMaterials(gl, textureShadingProgram, './assets/counter_base.obj', './assets/counter_base.mtl');
 counter_base.material.ambient = [0.7, 0.3, 0.2];
@@ -66,18 +67,18 @@ skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
 const mainLight = createLight(
 	gl,
-	[0.0, 0.0, -1.0, 0.0],
-	[1.0, 1.0, 1.0],
-	[0.0, 0.0, 1.0],
-	[0.0, 0.0, 1.0]
+	[-0.5, 1.0, -3.0, 0.0],
+	[1.0, 0.78, 0.79],
+	[1.0, 0.0, 0.0],
+	[1.0, 0.6, 0.6]
 );
 
 const pointLight = createLight(
 	gl,
-	[-1, 0, 3, 1.0],
+	[-0.4, 1.2, -1.15, 1.0],
 	[1.0, 1.0, 1.0],
-	[1.0, 0.0, 0.0],
-	[1.0, 0.0, 0.0]
+	[0.8, 0.8, 1.0],
+	[0.95, 0.95, 1.0]
 );
 
 const lightGroup = createLightGroup([mainLight, pointLight])
@@ -177,29 +178,28 @@ mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
 
 const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 teapot1.material = basicMaterial
-mat4.translate(teapot1.worldMatrix, teapot1.worldMatrix, cameraLook)
-mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.3, 0.3, 0.3])
+mat4.translate(teapot1.worldMatrix, teapot1.worldMatrix, [-0.4, 1.2, -1.15])
+mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
-const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-teapot2.material = basicMaterial
-mat4.translate(teapot2.worldMatrix, teapot2.worldMatrix, [-3, 0, 5])
-mat4.scale(teapot2.worldMatrix, teapot2.worldMatrix, [0.3, 0.3, 0.3])
+// const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+// teapot2.material = basicMaterial
+// mat4.translate(teapot2.worldMatrix, teapot2.worldMatrix, [-3, 0, 5])
+// mat4.scale(teapot2.worldMatrix, teapot2.worldMatrix, [0.3, 0.3, 0.3])
 
-const teapot3 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-teapot3.material = basicMaterial
-mat4.translate(teapot3.worldMatrix, teapot3.worldMatrix, [-2, 1, 0])
-mat4.scale(teapot3.worldMatrix, teapot3.worldMatrix, [0.3, 0.3, 0.3])
+// const teapot3 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+// teapot3.material = basicMaterial
+// mat4.translate(teapot3.worldMatrix, teapot3.worldMatrix, [-2, 1, 0])
+// mat4.scale(teapot3.worldMatrix, teapot3.worldMatrix, [0.3, 0.3, 0.3])
 
-const teapotCenter = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-teapotCenter.material = basicMaterial
-mat4.translate(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [-1, 0, 3])
-mat4.scale(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [0.3, 0.3, 0.3])
+// const teapotCenter = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+// teapotCenter.material = basicMaterial
+// mat4.translate(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [-1, 0, 3])
+// mat4.scale(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [0.3, 0.3, 0.3])
 
 const counterWorldMatrix = new Float32Array(16);
 mat4.identity(counterWorldMatrix);
 mat4.translate(counterWorldMatrix, counterWorldMatrix, [-3, -1, 0]);
 mat4.scale(counterWorldMatrix, counterWorldMatrix, [1, 1, 1]);
-// mat4.rotate(counterWorldMatrix, counterWorldMatrix, toRadian(-45), [0, 1, 0]);
 counter_base.worldMatrix = counterWorldMatrix;
 counter_top.worldMatrix = counterWorldMatrix;
 
