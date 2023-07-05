@@ -26,7 +26,7 @@ void main() {
 	if (u_lightPos.w == 0.0) {
 		L = normalize(vec3(u_matView * u_lightPos));
 	} else {
-		L = normalize(vec3(u_lightPos) - v_position);
+		L = normalize(vec3(u_matView * u_lightPos) - v_position);
 	}
 	vec3 H = normalize(L + vec3(0.0, 0.0, 1.0));
 
