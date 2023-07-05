@@ -36,12 +36,14 @@ const textureShadingProgram = await createProgram(gl, "./shader/texture_shading"
 // Objects
 
 const lime = await createObject(gl, textureShadingProgram, "./assets/lime.obj");
+const kiwi = await createObject(gl, textureShadingProgram, "./assets/kiwi.obj");
+const pomegranate = await createObject(gl, textureShadingProgram, "./assets/pomgranate.obj");
 
 const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
 ipad.material.ambient = [0.2, 0.2, 0.2]
 ipad.material.diffuse = [0.8, 0.8, 0.8]
 
-const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj')
+const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj');
 const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
 
 const counter_base = await createObjectWithMaterials(gl, textureShadingProgram, './assets/counter_base.obj', './assets/counter_base.mtl');
@@ -58,7 +60,12 @@ sink.material.ambient = [0.25, 0.25, 0.25];
 sink.material.specular = [0.8, 0.8, 0.8];
 
 const cutting_board = await createObjectWithMaterials(gl, textureShadingProgram, './assets/cutting_board.obj', './assets/cutting_board.mtl');
-cutting_board.material.ambient = [0.5, 0.5, 0.5]
+cutting_board.material.ambient = [0.5, 0.5, 0.5];
+
+const knife = await createObjectWithMaterials(gl, textureShadingProgram, './assets/kitchen_knife.obj', './assets/kitchen_knife.mtl');
+knife.material.ambient = [0.5, 0.5, 0.5];
+
+const glass = await createObject(gl, videoProgram, './assets/drinking_glass.obj');
 
 skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -87,11 +94,15 @@ lightGroup.apply(textureShadingProgram)
 // Textures
 
 let lime_texture = createTexture(gl, await loadImage("assets/lime_albedo.jpg"), 1, true, true);
+let kiwi_texture = createTexture(gl, await loadImage("assets/kiwi.jpg"), 1, true, true);
+let pomegranate_texture = createTexture(gl, await loadImage("assets/pomegranate.jpg"), 1, true, true);
 const ipad_texture = createTexture(gl, await loadImage('assets/ipad.jpg'), 2, true, true)
 const video_texture = createTexture(gl, await loadVideo('./assets/video.mp4'), 3, false, false);
 const counter_base_texture = createTexture(gl, await loadImage("./assets/wood_counter_base.jpg"), 4, true, true);
 const counter_top_texture = createTexture(gl, await loadImage("./assets/marble_counter_top.jpg"), 5, true, true);
 const cutting_board_texture = createTexture(gl, await loadImage("./assets/cutting_board.jpg"), 6, true, true);
+const knife_texture = createTexture(gl, await loadImage("./assets/kitchen_knife.png"), 7, true, true);
+const glass_texture = createTexture(gl, await loadImage("./assets/drinking_glass.png"), 8, true, true);
 
 // Materials
 
@@ -127,11 +138,11 @@ camera.apply(basicShadingProgram)
 camera.apply(sphereMappingProgram)
 camera.apply(skyboxProgram)
 camera.apply(textureShadingProgram);
-camera.apply(videoProgram)
+camera.apply(videoProgram);
 
 // Camera Movement
 
-const cameraPos = [0.0, 0.0, 0.0]
+const cameraPos = [0.0, 0.5, 0.0]
 const cameraDir = [0.0, 0.0, 0.0]
 
 const rotationFactor = Math.PI / 128
@@ -206,7 +217,11 @@ counter_top.worldMatrix = counterWorldMatrix;
 faucet.worldMatrix = counterWorldMatrix;
 sink.worldMatrix = counterWorldMatrix;
 cutting_board.worldMatrix = counterWorldMatrix;
+knife.worldMatrix = counterWorldMatrix;
+glass.worldMatrix = counterWorldMatrix;
 lime.worldMatrix = counterWorldMatrix;
+kiwi.worldMatrix = counterWorldMatrix;
+pomegranate.worldMatrix = counterWorldMatrix;
 ipad.worldMatrix = counterWorldMatrix;
 ipadScreen.worldMatrix = counterWorldMatrix;
 
@@ -249,6 +264,16 @@ function render() {
 	lime_texture.load(textureShadingProgram, "u_sampler");
 	lime.draw(camera);
 
+	// -- Kiwi
+
+	kiwi_texture.load(textureShadingProgram, "u_sampler");
+	kiwi.draw(camera);
+
+	// -- Pomegranate
+
+	pomegranate_texture.load(textureShadingProgram, "u_sampler");
+	pomegranate.draw(camera);
+
 	// -- iPad
 
 	ipad_texture.load(textureShadingProgram, 'u_sampler')
@@ -277,11 +302,25 @@ function render() {
 
 	// -- Knife
 
+	knife_texture.load(textureShadingProgram, 'u_sampler');
+	knife.draw(camera);
 
+	// -- Glass
+
+	gl.depthMask(false)
+	gl.enable(gl.BLEND)
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	gl.blendEquation(gl.FUNC_ADD)
+
+	glass_texture.load(videoProgram, 'u_texture');
+	glass.draw(camera);
+
+	gl.disable(gl.BLEND)
+	gl.depthMask(true)
 
 	// -- Test Teapots
 
-	teapot1.draw(camera)
+
 
 	requestAnimationFrame(render);
 }
