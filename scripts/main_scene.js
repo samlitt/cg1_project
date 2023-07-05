@@ -23,6 +23,7 @@ export async function createMainScene(gl, canvas) {
 	const skyboxProgram = await createProgram(gl, './shader/skybox')
 	const videoProgram = await createProgram(gl, './shader/video')
 	const textureShadingProgram = await createProgram(gl, "./shader/texture_shading");
+	const baiscTextureProgram = await createProgram(gl, './shader/basic_texture')
 
 	// Objects
 
@@ -57,7 +58,7 @@ export async function createMainScene(gl, canvas) {
 	const knife = await createObjectWithMaterials(gl, textureShadingProgram, './assets/kitchen_knife.obj', './assets/kitchen_knife.mtl');
 	knife.material.ambient = [0.5, 0.5, 0.5];
 
-	const glass = await createObject(gl, videoProgram, './assets/drinking_glass.obj');
+	const glass = await createObject(gl, baiscTextureProgram, './assets/drinking_glass.obj');
 
 	skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -131,6 +132,7 @@ export async function createMainScene(gl, canvas) {
 	camera.apply(skyboxProgram)
 	camera.apply(textureShadingProgram);
 	camera.apply(videoProgram);
+	camera.apply(baiscTextureProgram)
 
 	// Camera Movement
 
@@ -234,6 +236,7 @@ export async function createMainScene(gl, canvas) {
 		camera.apply(skyboxProgram)
 		camera.apply(textureShadingProgram)
 		camera.apply(videoProgram)
+		camera.apply(baiscTextureProgram)
 
 		// Calculate Cam Direction
 		mat3.fromMat4(inverseViewMatrix, camera.viewMatrix)
@@ -303,7 +306,7 @@ export async function createMainScene(gl, canvas) {
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 		gl.blendEquation(gl.FUNC_ADD)
 
-		glass_texture.load(videoProgram, 'u_texture');
+		glass_texture.load(baiscTextureProgram, 'u_texture');
 		glass.draw(camera);
 
 		gl.disable(gl.BLEND)
