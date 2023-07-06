@@ -114,7 +114,7 @@ export function createLight(gl, pos, ambient, diffuse, specular) {
 
 		gl.useProgram(program);
 
-		gl.uniform4fv(posUniformLocation, pos);
+		gl.uniform4fv(posUniformLocation, this.pos);
 		gl.uniform3fv(ambientUniformLocation, ambient);
 		gl.uniform3fv(diffuseUniformLocation, diffuse);
 		gl.uniform3fv(specularUniformLocation, specular);
@@ -124,6 +124,7 @@ export function createLight(gl, pos, ambient, diffuse, specular) {
 
 	return {
 		apply,
+		pos,
 		posName: 'u_lights[0].pos',
 		ambientName: 'u_lights[0].ambient',
 		diffuseName: 'u_lights[0].diffuse',

@@ -31,7 +31,7 @@ export async function createMainScene(gl, canvas) {
 	const pomegranate = await createObject(gl, textureShadingProgram, "./assets/pomgranate.obj");
 
 	const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
-	ipad.material.ambient = [0.2, 0.2, 0.2]
+	ipad.material.ambient = [0.5, 0.5, 0.5]
 	ipad.material.diffuse = [0.8, 0.8, 0.8]
 
 	const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj');
@@ -71,12 +71,13 @@ export async function createMainScene(gl, canvas) {
 		[1.0, 0.6, 0.6]
 	);
 
+	window.lightPos = [-0.4, 1.3, -1.4]
 	const pointLight = createLight(
 		gl,
-		[-0.4, 1.2, -1.15, 1.0],
+		[...lightPos, 1.0],
 		[1.0, 1.0, 1.0],
-		[0.8, 0.8, 1.0],
-		[0.95, 0.95, 1.0]
+		[0.85, 0.85, 1.0],
+		[0.9, 0.9, 1.0]
 	);
 
 	const lightGroup = createLightGroup([mainLight, pointLight])
@@ -170,6 +171,9 @@ export async function createMainScene(gl, canvas) {
 	const inverseViewMatrix = new Float32Array(9)
 	const camDir = new Float32Array(3)
 
+	const identityMatrix = new Float32Array(16)
+	mat4.identity(identityMatrix)
+
 	const ipadWorldMatrix = new Float32Array(16)
 	mat4.identity(ipadWorldMatrix)
 	mat4.translate(ipadWorldMatrix, ipadWorldMatrix, [0, 0, 0])
@@ -181,7 +185,7 @@ export async function createMainScene(gl, canvas) {
 
 	const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 	teapot1.material = basicMaterial
-	mat4.translate(teapot1.worldMatrix, teapot1.worldMatrix, [-0.4, 1.2, -1.15])
+	mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
 	mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
 	// const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
@@ -221,6 +225,13 @@ export async function createMainScene(gl, canvas) {
 
 	function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+		pointLight.pos = [...window.lightPos, 1.0]
+		lightGroup.apply(basicShadingProgram)
+		lightGroup.apply(textureShadingProgram)
+
+		mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
+		mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
 		// -- Camera
 
@@ -313,6 +324,7 @@ export async function createMainScene(gl, canvas) {
 
 		// -- Test Teapots
 
+		// teapot1.draw(camera)
 	}
 
 	return {
