@@ -190,10 +190,13 @@ export async function createMainScene(gl, width, height) {
 	camera.set(cameraEye, cameraLook, [0.0, 1.0, 0.0])
 	camera.apply(basicShadingProgram)
 	camera.apply(sphereMappingProgram)
-	camera.apply(skyboxProgram)
 	camera.apply(textureShadingProgram);
 	camera.apply(videoProgram);
 	camera.apply(baiscTextureProgram)
+
+	const skyboxCamera = createCamera(gl, toRadian(60), width / height)
+	skyboxCamera.set(cameraEye, cameraLook, [0.0, 1.0, 0.0])
+	skyboxCamera.apply(skyboxProgram)
 
 	// Camera Movement
 
@@ -310,10 +313,12 @@ export async function createMainScene(gl, width, height) {
 		camera.set(cameraPos, cameraLook, [0.0, 1.0, 0.0])
 		camera.apply(basicShadingProgram)
 		camera.apply(sphereMappingProgram)
-		camera.apply(skyboxProgram)
 		camera.apply(textureShadingProgram)
 		camera.apply(videoProgram)
 		camera.apply(baiscTextureProgram)
+
+		skyboxCamera.set(cameraPos, cameraLook, [0.0, 1.0, 0.0])
+		skyboxCamera.apply(skyboxProgram)
 
 		// Calculate Cam Direction
 		mat3.fromMat4(inverseViewMatrix, camera.viewMatrix)
