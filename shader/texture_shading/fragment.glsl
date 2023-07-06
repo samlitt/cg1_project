@@ -61,7 +61,7 @@ void main() {
 	vec3 light2 = calculateLight(u_lights[1], N);
 
 	vec3 lightingColor = emissive + light1 + light2;
-	gl_FragData[0] = vec4(lightingColor * textureColor.rgb, 1.0);
+	gl_FragData[0] = vec4(lightingColor * textureColor.rgb, textureColor.a);
 
   	float brightness = dot(gl_FragData[0].rgb, vec3(0.2126, 0.7152, 0.0722));
    if(brightness > 0.975)

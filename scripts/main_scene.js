@@ -57,7 +57,14 @@ export async function createMainScene(gl, width, height) {
 	const knife = await createObjectWithMaterials(gl, textureShadingProgram, './assets/kitchen_knife.obj', './assets/kitchen_knife.mtl');
 	knife.material.ambient = [0.5, 0.5, 0.5];
 
-	const glass = await createObject(gl, baiscTextureProgram, './assets/drinking_glass.obj');
+	const glass = await createObject(gl, textureShadingProgram, './assets/drinking_glass.obj');
+	glass.material = createMaterial(gl, textureShadingProgram, 
+		[0, 0, 0],
+		[1.0, 1.0, 1.0],
+		[1.0, 1.0, 1.0],
+		[1.0, 1.0, 1.0],
+		20
+	)
 
 	skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -316,7 +323,7 @@ export async function createMainScene(gl, width, height) {
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 		gl.blendEquation(gl.FUNC_ADD)
 
-		glass_texture.load(baiscTextureProgram, 'u_texture');
+		glass_texture.load(textureShadingProgram, 'u_sampler');
 		glass.draw(camera);
 
 		gl.disable(gl.BLEND)
