@@ -95,7 +95,14 @@ export async function createMainScene(gl, width, height) {
 
 	const shaker = await createObject(gl, sphereMappingProgram, './assets/cocktail_shaker.obj');
 
-	skybox.texture.load(sphereMappingProgram, 'u_skybox')
+	const teapot = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+	teapot.material = createMaterial(gl, basicShadingProgram,
+		[0, 0, 0],
+		[0.25, 0.20, 0.07],
+		[0.75, 0.61, 0.23],
+		[0.63, 0.56, 0.37],
+		83.2
+	)
 
 	// Lights
 
@@ -223,7 +230,7 @@ export async function createMainScene(gl, width, height) {
 
 	const zoomFactor = 0.1
 	const maxZoom = 0.8
-	const minZoom = -1.3
+	const minZoom = -4
 	let zoom = 0
 
 	window.addEventListener('keydown', (event) => {
@@ -244,10 +251,7 @@ export async function createMainScene(gl, width, height) {
 		}
 	})
 
-	// Variables
-
-	const inverseViewMatrix = new Float32Array(9)
-	const camDir = new Float32Array(3)
+	// Positioning
 
 	const identityMatrix = new Float32Array(16)
 	mat4.identity(identityMatrix)
@@ -261,10 +265,7 @@ export async function createMainScene(gl, width, height) {
 	// ipad.worldMatrix = ipadWorldMatrix
 	// ipadScreen.worldMatrix = ipadWorldMatrix
 
-	const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-	teapot1.material = basicMaterial
-	mat4.translate(teapot1.worldMatrix, identityMatrix, cameraLook)
-	mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
+	
 
 	// const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 	// teapot2.material = basicMaterial
@@ -280,6 +281,8 @@ export async function createMainScene(gl, width, height) {
 	// teapotCenter.material = basicMaterial
 	// mat4.translate(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [-1, 0, 3])
 	// mat4.scale(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [0.3, 0.3, 0.3])
+
+	
 
 	const counterWorldMatrix = new Float32Array(16);
 	mat4.identity(counterWorldMatrix);
@@ -304,6 +307,15 @@ export async function createMainScene(gl, width, height) {
 	pomegranate.worldMatrix = counterWorldMatrix;
 	ipad.worldMatrix = counterWorldMatrix;
 	ipadScreen.worldMatrix = counterWorldMatrix;
+
+	mat4.translate(teapot.worldMatrix, teapot.worldMatrix, [0.7, 0.6, -0.6])
+	mat4.rotate(teapot.worldMatrix, teapot.worldMatrix, toRadian(90), [0, 1, 0])
+	mat4.scale(teapot.worldMatrix, teapot.worldMatrix, [0.15, 0.15, 0.15])
+
+	// Variables
+
+	const inverseViewMatrix = new Float32Array(9)
+	const camDir = new Float32Array(3)
 
 	// Render Loop
 
@@ -417,6 +429,10 @@ export async function createMainScene(gl, width, height) {
 		knife_texture.load(textureShadingProgram, 'u_sampler');
 		knife.draw(camera);
 
+		// -- Teapot
+
+		teapot.draw(camera)
+
 		// -- Glass
 
 		gl.depthMask(false)
@@ -427,15 +443,7 @@ export async function createMainScene(gl, width, height) {
 		glass_texture.load(textureShadingProgram, 'u_sampler');
 		glass.draw(camera);
 
-		gl.disable(gl.BLEND)
-		gl.depthMask(true)
-
 		// -- Absolut Vodka Bottle
-
-		gl.depthMask(false)
-		gl.enable(gl.BLEND)
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-		gl.blendEquation(gl.FUNC_ADD)
 
 		absolut_bottle_texture.load(textureShadingProgram, 'u_sampler');
 		bottle.draw(camera);
