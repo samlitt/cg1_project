@@ -179,8 +179,8 @@ export async function createMainScene(gl, width, height) {
 
 	// Camera
 
-	const cameraEye = [2.0, 2.0, 1.2]
-	const cameraLook = [-1, 1, -1]
+	const cameraEye = [-1.0, 1.75, 0.5]
+	const cameraLook = [-1.0, 1.0, -0.8]
 	const camera = createCamera(gl, toRadian(45), width / height)
 	camera.set(cameraEye, cameraLook, [0.0, 1.0, 0.0])
 	camera.apply(basicShadingProgram)
@@ -195,16 +195,16 @@ export async function createMainScene(gl, width, height) {
 
 	// Camera Movement
 
-	const cameraPos = [0.0, 0.5, 0.0]
+	const cameraPos = [0.0, 0.0, 0.0]
 	const cameraDir = [0.0, 0.0, 0.0]
 
 	const rotationFactor = Math.PI / 128
 	const maxRotation = 2 * Math.PI // Quarter circle
-	let rotation = 0
+	let rotation = -0.5
 
 	const zoomFactor = 0.1
-	const maxZoom = 1
-	const minZoom = -4
+	const maxZoom = 0.8
+	const minZoom = -1.3
 	let zoom = 0
 
 	window.addEventListener('keydown', (event) => {
@@ -244,7 +244,7 @@ export async function createMainScene(gl, width, height) {
 
 	const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 	teapot1.material = basicMaterial
-	mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
+	mat4.translate(teapot1.worldMatrix, identityMatrix, cameraLook)
 	mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
 	// const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
@@ -291,12 +291,12 @@ export async function createMainScene(gl, width, height) {
 	function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-		pointLight.pos = [...window.lightPos, 1.0]
-		lightGroup.apply(basicShadingProgram)
-		lightGroup.apply(textureShadingProgram)
+		// pointLight.pos = [...window.lightPos, 1.0]
+		// lightGroup.apply(basicShadingProgram)
+		// lightGroup.apply(textureShadingProgram)
 
-		mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
-		mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
+		// mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
+		// mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
 		// -- Camera
 
@@ -428,7 +428,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Test Teapots
 
-		// teapot1.draw(camera)
+		teapot1.draw(camera)
 	}
 
 	return {
