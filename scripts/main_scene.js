@@ -56,6 +56,9 @@ export async function createMainScene(gl, width, height) {
 
 	const knife = await createObjectWithMaterials(gl, textureShadingProgram, './assets/kitchen_knife.obj', './assets/kitchen_knife.mtl');
 	knife.material.ambient = [0.5, 0.5, 0.5];
+	knife.material.diffuse = [0.5, 0.5, 0.5];
+	knife.material.specular = [0.8, 0.8, 0.8]
+	knife.material.shininess = 200
 
 	const glass = await createObject(gl, textureShadingProgram, './assets/drinking_glass.obj');
 	glass.material = createMaterial(gl, textureShadingProgram, 
@@ -75,7 +78,7 @@ export async function createMainScene(gl, width, height) {
 		[-1.0, 1.0, -1.0, 0.0],
 		[1.0, 0.78, 0.79],
 		[1.0, 0.3, 0.3],
-		[1.0, 0.6, 0.6]
+		[0.8, 0.4, 0.4]
 	);
 
 	window.lightPos = [-0.4, 1.3, -1.4]
