@@ -4,6 +4,8 @@ import { mat4, mat3 } from './matrix.js'
 export function createContext(canvasId) {
 	/** @type {HTMLCanvasElement} */
 	const canvas = document.getElementById(canvasId)
+	canvas.width = canvas.getBoundingClientRect().width
+	canvas.height = canvas.getBoundingClientRect().height
 	const gl = canvas.getContext('webgl')
 	return { gl, canvas }
 }
@@ -114,7 +116,7 @@ export function createLight(gl, pos, ambient, diffuse, specular) {
 
 		gl.useProgram(program);
 
-		gl.uniform4fv(posUniformLocation, pos);
+		gl.uniform4fv(posUniformLocation, this.pos);
 		gl.uniform3fv(ambientUniformLocation, ambient);
 		gl.uniform3fv(diffuseUniformLocation, diffuse);
 		gl.uniform3fv(specularUniformLocation, specular);
@@ -124,6 +126,7 @@ export function createLight(gl, pos, ambient, diffuse, specular) {
 
 	return {
 		apply,
+		pos,
 		posName: 'u_lights[0].pos',
 		ambientName: 'u_lights[0].ambient',
 		diffuseName: 'u_lights[0].diffuse',
@@ -364,6 +367,9 @@ export async function createObjectWithMaterials(gl, program, objPath, mtlPath) {
 			},
 			set diffuse(newValue) {
 				objects.forEach(o => o.material.diffuse = newValue)
+			},
+			set specular(newValue) {
+				objects.forEach(o => o.material.specular = newValue)
 			},
 			set shininess(newValue) {
 				objects.forEach(o => o.material.shininess = newValue)

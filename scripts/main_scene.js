@@ -13,7 +13,7 @@ import {
 	createTexture
 } from "./utils.js";
 
-export async function createMainScene(gl, canvas) {
+export async function createMainScene(gl, width, height) {
 
 	// Programs
 
@@ -31,7 +31,7 @@ export async function createMainScene(gl, canvas) {
 	const pomegranate = await createObject(gl, textureShadingProgram, "./assets/pomgranate.obj");
 
 	const ipad = await createObjectWithMaterials(gl, textureShadingProgram, './assets/ipad.obj', './assets/ipad.mtl')
-	ipad.material.ambient = [0.2, 0.2, 0.2]
+	ipad.material.ambient = [0.5, 0.5, 0.5]
 	ipad.material.diffuse = [0.8, 0.8, 0.8]
 
 	const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj');
@@ -42,7 +42,7 @@ export async function createMainScene(gl, canvas) {
 	counter_base.material.ambient = [0.7, 0.3, 0.2];
 
 	const counter_top = await createObjectWithMaterials(gl, textureShadingProgram, './assets/counter_top.obj', './assets/counter_top.mtl');
-	counter_top.material.ambient = [0.5, 0.5, 0.5];
+	counter_top.material.ambient = [0.3, 0.3, 0.3];
 
 	const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj');
 
@@ -52,12 +52,19 @@ export async function createMainScene(gl, canvas) {
 	sink.material.specular = [0.8, 0.8, 0.8];
 
 	const cutting_board = await createObjectWithMaterials(gl, textureShadingProgram, './assets/cutting_board.obj', './assets/cutting_board.mtl');
-	cutting_board.material.ambient = [0.5, 0.5, 0.5];
+	cutting_board.material.ambient = [0.35, 0.35, 0.35];
 
 	const knife = await createObjectWithMaterials(gl, textureShadingProgram, './assets/kitchen_knife.obj', './assets/kitchen_knife.mtl');
 	knife.material.ambient = [0.5, 0.5, 0.5];
 
-	const glass = await createObject(gl, baiscTextureProgram, './assets/drinking_glass.obj');
+	const glass = await createObject(gl, textureShadingProgram, './assets/drinking_glass.obj');
+	glass.material = createMaterial(gl, textureShadingProgram, 
+		[0, 0, 0],
+		[1.0, 1.0, 1.0],
+		[1.0, 1.0, 1.0],
+		[1.0, 1.0, 1.0],
+		100
+	)
 
 	skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -65,18 +72,19 @@ export async function createMainScene(gl, canvas) {
 
 	const mainLight = createLight(
 		gl,
-		[-0.5, 1.0, -3.0, 0.0],
+		[-1.0, 1.0, -1.0, 0.0],
 		[1.0, 0.78, 0.79],
-		[1.0, 0.0, 0.0],
+		[1.0, 0.3, 0.3],
 		[1.0, 0.6, 0.6]
 	);
 
+	window.lightPos = [-0.4, 1.3, -1.4]
 	const pointLight = createLight(
 		gl,
-		[-0.4, 1.2, -1.15, 1.0],
+		[...lightPos, 1.0],
 		[1.0, 1.0, 1.0],
-		[0.8, 0.8, 1.0],
-		[0.95, 0.95, 1.0]
+		[0.85, 0.85, 1.0],
+		[0.9, 0.9, 1.0]
 	);
 
 	const lightGroup = createLightGroup([mainLight, pointLight])
@@ -108,23 +116,25 @@ export async function createMainScene(gl, canvas) {
 		20.0
 	)
 
-	const limeMaterial = createMaterial(
+	const basicTextureMaterial = createMaterial(
 		gl,
 		textureShadingProgram,
 		[0.0, 0.0, 0.0], // emissive
-		[0.4, 0.4, 0.4], // ambient
-		[0.4, 0.4, 0.4], // diffuse
-		[0.5, 0.5, 0.5], // specular
-		1.0				  // shininess
+		[0.3, 0.3, 0.3], // ambient
+		[0.8, 0.8, 0.8], // diffuse
+		[0.8, 0.8, 0.8], // specular
+		5.0				  // shininess
 	);
 
-	lime.material = limeMaterial;
+	lime.material = basicTextureMaterial
+	kiwi.material = basicTextureMaterial
+	pomegranate.material = basicTextureMaterial
 
 	// Camera
 
 	const cameraEye = [2.0, 2.0, 1.2]
 	const cameraLook = [-1, 1, -1]
-	const camera = createCamera(gl, toRadian(45), canvas.width / canvas.height)
+	const camera = createCamera(gl, toRadian(45), width / height)
 	camera.set(cameraEye, cameraLook, [0.0, 1.0, 0.0])
 	camera.apply(basicShadingProgram)
 	camera.apply(sphereMappingProgram)
@@ -170,6 +180,9 @@ export async function createMainScene(gl, canvas) {
 	const inverseViewMatrix = new Float32Array(9)
 	const camDir = new Float32Array(3)
 
+	const identityMatrix = new Float32Array(16)
+	mat4.identity(identityMatrix)
+
 	const ipadWorldMatrix = new Float32Array(16)
 	mat4.identity(ipadWorldMatrix)
 	mat4.translate(ipadWorldMatrix, ipadWorldMatrix, [0, 0, 0])
@@ -181,7 +194,7 @@ export async function createMainScene(gl, canvas) {
 
 	const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 	teapot1.material = basicMaterial
-	mat4.translate(teapot1.worldMatrix, teapot1.worldMatrix, [-0.4, 1.2, -1.15])
+	mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
 	mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
 	// const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
@@ -222,6 +235,13 @@ export async function createMainScene(gl, canvas) {
 	function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
+		pointLight.pos = [...window.lightPos, 1.0]
+		lightGroup.apply(basicShadingProgram)
+		lightGroup.apply(textureShadingProgram)
+
+		mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
+		mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
+
 		// -- Camera
 
 		vec3.rotateY(cameraPos, cameraEye, cameraLook, -rotation)
@@ -249,7 +269,7 @@ export async function createMainScene(gl, canvas) {
 
 		// -- Skybox
 
-		skybox.draw()
+		// skybox.draw()
 
 
 		// -- Lime
@@ -285,6 +305,7 @@ export async function createMainScene(gl, canvas) {
 
 		// -- Faucet and Sink
 
+		skybox.texture.load(sphereMappingProgram, 'u_skybox')
 		faucet.draw(camera)
 		sink.draw(camera);
 
@@ -305,7 +326,7 @@ export async function createMainScene(gl, canvas) {
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 		gl.blendEquation(gl.FUNC_ADD)
 
-		glass_texture.load(baiscTextureProgram, 'u_texture');
+		glass_texture.load(textureShadingProgram, 'u_sampler');
 		glass.draw(camera);
 
 		gl.disable(gl.BLEND)
@@ -313,6 +334,7 @@ export async function createMainScene(gl, canvas) {
 
 		// -- Test Teapots
 
+		// teapot1.draw(camera)
 	}
 
 	return {
