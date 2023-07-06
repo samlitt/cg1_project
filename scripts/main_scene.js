@@ -13,6 +13,9 @@ import {
 	createTexture
 } from "./utils.js";
 
+/**
+ * @param {WebGLRenderingContext} gl 
+ */
 export async function createMainScene(gl, width, height) {
 
 	// Programs
