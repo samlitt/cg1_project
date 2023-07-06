@@ -61,14 +61,39 @@ export async function createMainScene(gl, width, height) {
 	knife.material.specular = [0.8, 0.8, 0.8]
 	knife.material.shininess = 200
 
-	const glass = await createObject(gl, textureShadingProgram, './assets/drinking_glass.obj');
-	glass.material = createMaterial(gl, textureShadingProgram, 
+	const bottle = await createObject(gl, textureShadingProgram, './assets/absolut_bottle.obj');
+	bottle.material = createMaterial(gl, textureShadingProgram,
+		[0.0, 0.0, 0.0],
+		[0.2, 0.2, 0.2],
+		[1.0, 1.0, 1.0],
+		[0.7, 0.7, 0.7],
+		100
+	)
+
+	const wall = await createObject(gl, baiscTextureProgram, './assets/wall.obj');
+
+	const floor = await createObject(gl, baiscTextureProgram, './assets/floor.obj');
+	const ceil = await createObject(gl, baiscTextureProgram, './assets/ceil.obj');
+
+	const window_frame = await createObject(gl, textureShadingProgram, './assets/window.obj');
+	window_frame.material = createMaterial(gl, textureShadingProgram,
 		[0, 0, 0],
 		[1.0, 1.0, 1.0],
 		[1.0, 1.0, 1.0],
 		[1.0, 1.0, 1.0],
 		100
 	)
+
+	const glass = await createObject(gl, textureShadingProgram, './assets/drinking_glass.obj');
+	glass.material = createMaterial(gl, textureShadingProgram,
+		[0, 0, 0],
+		[1.0, 1.0, 1.0],
+		[1.0, 1.0, 1.0],
+		[1.0, 1.0, 1.0],
+		100
+	)
+
+	const shaker = await createObject(gl, sphereMappingProgram, './assets/cocktail_shaker.obj');
 
 	skybox.texture.load(sphereMappingProgram, 'u_skybox')
 
@@ -108,6 +133,23 @@ export async function createMainScene(gl, width, height) {
 	const knife_texture = createTexture(gl, await loadImage("./assets/kitchen_knife.png"), 7, true, true);
 	const glass_texture = createTexture(gl, await loadImage("./assets/drinking_glass.png"), 8, true, true);
 	const sphereMapTexture = createTexture(gl, await loadImage('./assets/skybox.jpg'), 9, false, false)
+
+	const floor_texture = createTexture(gl, await loadImage("./assets/weathered_planks.jpg"), 9, true, true);
+	gl.bindTexture(gl.TEXTURE_2D, floor_texture.texture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	gl.bindTexture(gl.TEXTURE_2D, null)
+
+	const wall_texture = createTexture(gl, await loadImage("./assets/wall_bricks.jpg"), 10, true, true);
+	const ceil_texture = createTexture(gl, await loadImage("./assets/concrete_wall.jpg"), 11, true, true);
+	gl.bindTexture(gl.TEXTURE_2D, ceil_texture.texture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	gl.bindTexture(gl.TEXTURE_2D, null)
+
+	const window_texture = createTexture(gl, await loadImage("./assets/window.png"), 12, true, true)
+
+	const absolut_bottle_texture = createTexture(gl, await loadImage("./assets/absolut_bottle.png"), 13, true, true);
 
 	// Materials
 
@@ -162,7 +204,7 @@ export async function createMainScene(gl, width, height) {
 
 	const zoomFactor = 0.1
 	const maxZoom = 1
-	const minZoom = -6
+	const minZoom = -4
 	let zoom = 0
 
 	window.addEventListener('keydown', (event) => {
@@ -227,11 +269,17 @@ export async function createMainScene(gl, width, height) {
 	counter_base.worldMatrix = counterWorldMatrix;
 	counter_top.worldMatrix = counterWorldMatrix;
 
+	wall.worldMatrix = counterWorldMatrix;
+	floor.worldMatrix = counterWorldMatrix;
+	ceil.worldMatrix = counterWorldMatrix;
+	window_frame.worldMatrix = counterWorldMatrix;
 	faucet.worldMatrix = counterWorldMatrix;
 	sink.worldMatrix = counterWorldMatrix;
 	cutting_board.worldMatrix = counterWorldMatrix;
 	knife.worldMatrix = counterWorldMatrix;
 	glass.worldMatrix = counterWorldMatrix;
+	bottle.worldMatrix = counterWorldMatrix;
+	shaker.worldMatrix = counterWorldMatrix;
 	lime.worldMatrix = counterWorldMatrix;
 	kiwi.worldMatrix = counterWorldMatrix;
 	pomegranate.worldMatrix = counterWorldMatrix;
@@ -282,6 +330,28 @@ export async function createMainScene(gl, width, height) {
 		skybox.draw()
 
 
+		// -- Room
+
+		wall_texture.load(baiscTextureProgram, "u_texture");
+		wall.draw(camera);
+
+		floor_texture.load(baiscTextureProgram, "u_texture");
+		floor.draw(camera);
+
+		ceil_texture.load(baiscTextureProgram, "u_texture");
+		ceil.draw(camera);
+
+		gl.depthMask(false)
+		gl.enable(gl.BLEND)
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+		gl.blendEquation(gl.FUNC_ADD)
+
+		window_texture.load(textureShadingProgram, 'u_sampler');
+		window_frame.draw(camera);
+
+		gl.disable(gl.BLEND)
+		gl.depthMask(true)
+
 		// -- Lime
 
 		lime_texture.load(textureShadingProgram, "u_sampler");
@@ -313,11 +383,12 @@ export async function createMainScene(gl, width, height) {
 		counter_top_texture.load(textureShadingProgram, 'u_sampler');
 		counter_top.draw(camera);
 
-		// -- Faucet and Sink
+		// -- Faucet, Sink and Shaker
 
 		sphereMapTexture.load(sphereMappingProgram, 'u_skybox')
 		faucet.draw(camera)
 		sink.draw(camera);
+		shaker.draw(camera);
 
 		// -- Cutting Board
 
@@ -338,6 +409,19 @@ export async function createMainScene(gl, width, height) {
 
 		glass_texture.load(textureShadingProgram, 'u_sampler');
 		glass.draw(camera);
+
+		gl.disable(gl.BLEND)
+		gl.depthMask(true)
+
+		// -- Absolut Vodka Bottle
+
+		gl.depthMask(false)
+		gl.enable(gl.BLEND)
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+		gl.blendEquation(gl.FUNC_ADD)
+
+		absolut_bottle_texture.load(textureShadingProgram, 'u_sampler');
+		bottle.draw(camera);
 
 		gl.disable(gl.BLEND)
 		gl.depthMask(true)

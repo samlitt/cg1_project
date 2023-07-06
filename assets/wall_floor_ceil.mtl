@@ -1,0 +1,35 @@
+# Blender MTL File: 'kitchen counter.blend'
+# Material Count: 3
+
+newmtl Wall
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd /Users/vincentklingemann/Downloads/textures-9/wall_bricks_plaster_diff_1k.jpg
+
+newmtl ceiling
+Ns 33.833110
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.111399 0.111399 0.111399
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd /Users/vincentklingemann/Downloads/textures-10/concrete_wall_007_diff_1k.jpg
+
+newmtl floor
+Ns 33.833110
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.111399 0.111399 0.111399
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd /Users/vincentklingemann/Downloads/textures-8/weathered_planks_diff_1k.jpg
