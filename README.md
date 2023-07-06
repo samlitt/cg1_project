@@ -5,7 +5,7 @@ WebGL Projekt als Abgabe für das Modul Computergrafik 1
 Hab ein wenig Geduld, die Anwendung benötigt ein bisschen Zeit bis sie alle Assets geladen hat.
 
 Die Kamera kann mit den Tasten `a` und `d` um einen festen Punkt rotiert werden.
-Mit den Tasten `w` und `s` kann ran- bzw. rausgezoomt werden.
+Mit den Tasten `w` und `s` kann ran- bzw. raus-gezoomt werden.
 
 Die Anwendung funktioniert nur problemlos mit einer aktuellen Version(> 114.0.2) von Mozilla Firefox.
 
