@@ -1,13 +1,13 @@
 # cg1_project
-WebGL project as an university assignment
+WebGL Projekt als Abgabe für das Modul Computergrafik 1
 
 # Interaktion mit der Anwendung
-Hab ein wenig Geduld, die Anwendung benötigt ein bisschen Zeit bis sie geladen ist.
+Hab ein wenig Geduld, die Anwendung benötigt ein bisschen Zeit bis sie alle Assets geladen hat.
 
 Die Kamera kann mit den Tasten `a` und `d` um einen festen Punkt rotiert werden.
 Mit den Tasten `w` und `s` kann ran- bzw. rausgezoomt werden.
 
-Die Anwendung funktioniert nur problemlos mit einer aktuellen Version von Mozilla Firefox (< 114.0.2)
+Die Anwendung funktioniert nur problemlos mit einer aktuellen Version(> 114.0.2) von Mozilla Firefox.
 
 # Quellen
 
