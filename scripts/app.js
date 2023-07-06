@@ -18,12 +18,12 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
 const ext = gl.getExtension("WEBGL_draw_buffers");
 
-const width = canvas.width
-const height = canvas.height
+const width = canvas.width;
+const height = canvas.height;
 
-const mainScene = await createMainScene(gl, width, height)
-const blurScene = await createBlurScene(gl)
-const finalScene = await createFinalScene(gl)
+const mainScene = await createMainScene(gl, width, height);
+const blurScene = await createBlurScene(gl);
+const finalScene = await createFinalScene(gl);
 
 const sceneTexture = gl.createTexture()
 gl.bindTexture(gl.TEXTURE_2D, sceneTexture)
@@ -91,7 +91,7 @@ function render() {
 requestAnimationFrame(render)
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 async function createBlurScene(gl) {
 
@@ -155,14 +155,14 @@ async function createBlurScene(gl) {
 }
 
 /**
- * @param {WebGLRenderingContext} gl 
+ * @param {WebGLRenderingContext} gl
  */
 async function createFinalScene(gl) {
 	const program = await createProgram(gl, './shader/final')
 
 	const sceneTextureUniformLocation = gl.getUniformLocation(program, 'u_sceneSampler')
 	const blurTextureUniformLocation = gl.getUniformLocation(program, 'u_blurSampler')
-	
+
 	gl.useProgram(program)
 	gl.uniform1i(sceneTextureUniformLocation, 31)
 	gl.uniform1i(blurTextureUniformLocation, 30)
