@@ -13,7 +13,7 @@ import {
 	createTexture
 } from "./utils.js";
 
-export async function createMainScene(gl, canvas) {
+export async function createMainScene(gl, width, height) {
 
 	// Programs
 
@@ -125,7 +125,7 @@ export async function createMainScene(gl, canvas) {
 
 	const cameraEye = [2.0, 2.0, 1.2]
 	const cameraLook = [-1, 1, -1]
-	const camera = createCamera(gl, toRadian(45), canvas.width / canvas.height)
+	const camera = createCamera(gl, toRadian(45), width / height)
 	camera.set(cameraEye, cameraLook, [0.0, 1.0, 0.0])
 	camera.apply(basicShadingProgram)
 	camera.apply(sphereMappingProgram)

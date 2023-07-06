@@ -4,6 +4,8 @@ import { mat4, mat3 } from './matrix.js'
 export function createContext(canvasId) {
 	/** @type {HTMLCanvasElement} */
 	const canvas = document.getElementById(canvasId)
+	canvas.width = canvas.getBoundingClientRect().width
+	canvas.height = canvas.getBoundingClientRect().height
 	const gl = canvas.getContext('webgl')
 	return { gl, canvas }
 }

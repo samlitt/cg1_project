@@ -7,6 +7,8 @@ import {
 	createProgram
 } from "./utils.js";
 
+// await new Promise((resolve, _) => setTimeout(() => resolve(), 100))
+
 const { gl, canvas } = createContext('canvas');
 
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -18,17 +20,17 @@ gl.clearColor(0.8, 0.8, 0.8, 1.0);
 
 const ext = gl.getExtension("WEBGL_draw_buffers");
 
-const textureWidth = canvas.width
-const textureHeight = canvas.height
+const width = canvas.width
+const height = canvas.height
 
-const mainScene = await createMainScene(gl, canvas)
+const mainScene = await createMainScene(gl, width, height)
 const blurScene = await createBlurScene(gl)
 const finalScene = await createFinalScene(gl)
 
 const sceneTexture = gl.createTexture()
 gl.bindTexture(gl.TEXTURE_2D, sceneTexture)
 
-gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureWidth, textureHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
@@ -37,7 +39,7 @@ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 const brightnessTexture = gl.createTexture()
 gl.bindTexture(gl.TEXTURE_2D, brightnessTexture)
 
-gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureWidth, textureHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
@@ -56,7 +58,7 @@ ext.drawBuffersWEBGL([
 const depthBuffer = gl.createRenderbuffer()
 gl.bindRenderbuffer(gl.RENDERBUFFER, depthBuffer)
 
-gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, textureWidth, textureHeight)
+gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height)
 gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, depthBuffer)
 
 gl.bindTexture(gl.TEXTURE_2D, null)
@@ -68,14 +70,12 @@ let blurredTexture
 function render() {
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
-	gl.viewport(0, 0, textureWidth, textureHeight)
 
 	mainScene.render()
 
 	blurredTexture = blurScene.blur(brightnessTexture)
 
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null)
-	gl.viewport(0, 0, canvas.width, canvas.height)
 
 	gl.activeTexture(gl.TEXTURE31)
 	gl.bindTexture(gl.TEXTURE_2D, sceneTexture)
@@ -106,7 +106,7 @@ async function createBlurScene(gl) {
 	const setupBuffer = (framebuffer, texture) => {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer)
 		gl.bindTexture(gl.TEXTURE_2D, texture)
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureWidth, textureHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null)
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
@@ -122,7 +122,7 @@ async function createBlurScene(gl) {
 	const sizeUniformLocation = gl.getUniformLocation(program, 'u_size')
 
 	gl.useProgram(program)
-	gl.uniform2f(sizeUniformLocation, textureWidth, textureHeight)
+	gl.uniform2f(sizeUniformLocation, width, height)
 	gl.useProgram(null)
 
 	const quad = createQuad(gl, program)
