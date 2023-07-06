@@ -7,6 +7,8 @@ Hab ein wenig Geduld, die Anwendung benötigt ein bisschen Zeit bis sie geladen 
 Die Kamera kann mit den Tasten `a` und `d` um einen festen Punkt rotiert werden.
 Mit den Tasten `w` und `s` kann ran- bzw. rausgezoomt werden.
 
+Die Anwendung funktioniert nur problemlos mit einer aktuellen Version von Mozilla Firefox (< 114.0.2)
+
 # Quellen
 
 ## 3D-Objekte
