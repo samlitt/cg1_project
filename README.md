@@ -14,7 +14,9 @@ WebGL project as an university assignment
  - [Lime](https://polyhaven.com/a/food_lime_01)
 - [Pomegrante](https://polyhaven.com/a/food_pomegranate_01)
 - [Kiwi](https://polyhaven.com/a/food_kiwi_01)
-
+- [Absolut Bottle](https://sketchfab.com/3d-models/absolut-vodka-1l-bottle-e11913a2fcdb41d5badfa841d6448c90)
+- [Cocktail Shaker](https://sketchfab.com/3d-models/absolut-vodka-1l-bottle-e11913a2fcdb41d5badfa841d6448c90)
+- [Window](https://sketchfab.com/3d-models/wooden-window-352ebe31b9d346869f7e86e840276d44)
 ## Texturen
 - Kitchen counter base [Wood table](https://polyhaven.com/a/wood_table_001)
 - Kitchen counter top [Marble](https://polyhaven.com/a/marble_01)
