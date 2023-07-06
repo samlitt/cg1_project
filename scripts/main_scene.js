@@ -70,10 +70,10 @@ export async function createMainScene(gl, width, height) {
 		100
 	)
 
-	const wall = await createObject(gl, baiscTextureProgram, './assets/wall.obj');
+	const wall = await createObject(gl, textureShadingProgram, './assets/wall.obj');
 
-	const floor = await createObject(gl, baiscTextureProgram, './assets/floor.obj');
-	const ceil = await createObject(gl, baiscTextureProgram, './assets/ceil.obj');
+	const floor = await createObject(gl, textureShadingProgram, './assets/floor.obj');
+	const ceil = await createObject(gl, textureShadingProgram, './assets/ceil.obj');
 
 	const window_frame = await createObject(gl, textureShadingProgram, './assets/window.obj');
 	window_frame.material = createMaterial(gl, textureShadingProgram,
@@ -181,6 +181,20 @@ export async function createMainScene(gl, width, height) {
 	lime.material = basicTextureMaterial
 	kiwi.material = basicTextureMaterial
 	pomegranate.material = basicTextureMaterial
+
+	const wallMaterial = createMaterial(
+		gl,
+		textureShadingProgram,
+		[0.0, 0.0, 0.0], // emissive
+		[0.3, 0.3, 0.3], // ambient
+		[0.8, 0.8, 0.8], // diffuse
+		[0.8, 0.8, 0.8], // specular
+		100.0
+	)
+
+	wall.material = wallMaterial
+	ceil.material = wallMaterial
+	floor.material = wallMaterial
 
 	// Camera
 
@@ -337,13 +351,13 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Room
 
-		wall_texture.load(baiscTextureProgram, "u_texture");
+		wall_texture.load(textureShadingProgram, "u_sampler");
 		wall.draw(camera);
 
-		floor_texture.load(baiscTextureProgram, "u_texture");
+		floor_texture.load(textureShadingProgram, "u_sampler");
 		floor.draw(camera);
 
-		ceil_texture.load(baiscTextureProgram, "u_texture");
+		ceil_texture.load(textureShadingProgram, "u_sampler");
 		ceil.draw(camera);
 
 		gl.depthMask(false)
@@ -433,7 +447,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Test Teapots
 
-		teapot1.draw(camera)
+		// teapot1.draw(camera)
 	}
 
 	return {
