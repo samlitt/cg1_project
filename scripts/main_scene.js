@@ -13,6 +13,9 @@ import {
 	createTexture
 } from "./utils.js";
 
+/**
+ * @param {WebGLRenderingContext} gl 
+ */
 export async function createMainScene(gl, width, height) {
 
 	// Programs
@@ -284,6 +287,8 @@ export async function createMainScene(gl, width, height) {
 	const inverseViewMatrix = new Float32Array(9)
 	const camDir = new Float32Array(3)
 
+	const isWindowUniformLocation = gl.getUniformLocation(textureShadingProgram, 'u_isWindow')
+
 	// Render Loop
 
 	function render() {
@@ -336,8 +341,16 @@ export async function createMainScene(gl, width, height) {
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 		gl.blendEquation(gl.FUNC_ADD)
 
+		gl.useProgram(textureShadingProgram)
+		gl.uniform1i(isWindowUniformLocation, true)
+		gl.useProgram(null)
+
 		window_texture.load(textureShadingProgram, 'u_sampler');
 		window_frame.draw(camera);
+
+		gl.useProgram(textureShadingProgram)
+		gl.uniform1i(isWindowUniformLocation, false)
+		gl.useProgram(null)
 
 		gl.disable(gl.BLEND)
 

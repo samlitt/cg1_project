@@ -31,3 +31,6 @@ Die Anwendung funktioniert nur problemlos mit einer aktuellen Version(> 114.0.2)
 - Walls [Patio Tiles](https://polyhaven.com/a/patio_tiles)
 - Floor [Weathered Planks](https://polyhaven.com/a/weathered_planks)
 - Ceiling [Concrete Wall](https://polyhaven.com/a/concrete_wall_007)
+## HDRIs
+- [Environment Map](https://polyhaven.com/a/the_sky_is_on_fire)
+- [Reflection Map](https://polyhaven.com/a/blinds)
