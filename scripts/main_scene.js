@@ -35,8 +35,9 @@ export async function createMainScene(gl, width, height) {
 	ipad.material.diffuse = [0.8, 0.8, 0.8]
 
 	const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj');
-	const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
-	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(180), [0, 1, 0])
+	const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/the_sky_is_on_fire.jpg')
+	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(-15), [1, 0, 0])
+	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(30), [0, 1, 0])
 
 	const counter_base = await createObjectWithMaterials(gl, textureShadingProgram, './assets/counter_base.obj', './assets/counter_base.mtl');
 	counter_base.material.ambient = [0.7, 0.3, 0.2];
@@ -106,6 +107,7 @@ export async function createMainScene(gl, width, height) {
 	const cutting_board_texture = createTexture(gl, await loadImage("./assets/cutting_board.jpg"), 6, true, true);
 	const knife_texture = createTexture(gl, await loadImage("./assets/kitchen_knife.png"), 7, true, true);
 	const glass_texture = createTexture(gl, await loadImage("./assets/drinking_glass.png"), 8, true, true);
+	const sphereMapTexture = createTexture(gl, await loadImage('./assets/skybox.jpg'), 9, false, false)
 
 	// Materials
 
@@ -272,7 +274,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Skybox
 
-		// skybox.draw()
+		skybox.draw()
 
 
 		// -- Lime
@@ -308,7 +310,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Faucet and Sink
 
-		skybox.texture.load(sphereMappingProgram, 'u_skybox')
+		sphereMapTexture.load(sphereMappingProgram, 'u_skybox')
 		faucet.draw(camera)
 		sink.draw(camera);
 

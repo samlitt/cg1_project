@@ -42,6 +42,12 @@ export const vec3 = (() => {
 		out[2] = point[2] - axis[2] * amount
 	}
 
+	function add(out, a, b) {
+		out[0] = a[0] + b[0]
+		out[1] = a[1] + b[1]
+		out[2] = a[2] + b[2]
+	}
+
 	function sub(out, a, b) {
 		out[0] = a[0] - b[0]
 		out[1] = a[1] - b[1]
@@ -66,6 +72,7 @@ export const vec3 = (() => {
 		normalize,
 		rotateY,
 		translate,
+		add,
 		sub,
 		mulMat3
 	}
