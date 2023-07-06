@@ -216,12 +216,12 @@ export async function createMainScene(gl, width, height) {
 	const cameraDir = [0.0, 0.0, 0.0]
 
 	const rotationFactor = Math.PI / 128
-	const maxRotation = 2 * Math.PI // Quarter circle
+	const maxRotation = Math.PI / 4 // Eigth circle
 	let rotation = -0.5
 
 	const zoomFactor = 0.1
 	const maxZoom = 0.8
-	const minZoom = -4
+	const minZoom = -2.5
 	let zoom = 0
 
 	window.addEventListener('keydown', (event) => {
