@@ -42,7 +42,7 @@ export async function createMainScene(gl, width, height) {
 	counter_base.material.ambient = [0.7, 0.3, 0.2];
 
 	const counter_top = await createObjectWithMaterials(gl, textureShadingProgram, './assets/counter_top.obj', './assets/counter_top.mtl');
-	counter_top.material.ambient = [0.5, 0.5, 0.5];
+	counter_top.material.ambient = [0.3, 0.3, 0.3];
 
 	const faucet = await createObject(gl, sphereMappingProgram, './assets/faucet.obj');
 
@@ -52,7 +52,7 @@ export async function createMainScene(gl, width, height) {
 	sink.material.specular = [0.8, 0.8, 0.8];
 
 	const cutting_board = await createObjectWithMaterials(gl, textureShadingProgram, './assets/cutting_board.obj', './assets/cutting_board.mtl');
-	cutting_board.material.ambient = [0.5, 0.5, 0.5];
+	cutting_board.material.ambient = [0.35, 0.35, 0.35];
 
 	const knife = await createObjectWithMaterials(gl, textureShadingProgram, './assets/kitchen_knife.obj', './assets/kitchen_knife.mtl');
 	knife.material.ambient = [0.5, 0.5, 0.5];
@@ -63,7 +63,7 @@ export async function createMainScene(gl, width, height) {
 		[1.0, 1.0, 1.0],
 		[1.0, 1.0, 1.0],
 		[1.0, 1.0, 1.0],
-		20
+		100
 	)
 
 	skybox.texture.load(sphereMappingProgram, 'u_skybox')
@@ -72,9 +72,9 @@ export async function createMainScene(gl, width, height) {
 
 	const mainLight = createLight(
 		gl,
-		[-0.5, 1.0, -3.0, 0.0],
+		[-1.0, 1.0, -1.0, 0.0],
 		[1.0, 0.78, 0.79],
-		[1.0, 0.0, 0.0],
+		[1.0, 0.3, 0.3],
 		[1.0, 0.6, 0.6]
 	);
 
@@ -116,17 +116,19 @@ export async function createMainScene(gl, width, height) {
 		20.0
 	)
 
-	const limeMaterial = createMaterial(
+	const basicTextureMaterial = createMaterial(
 		gl,
 		textureShadingProgram,
 		[0.0, 0.0, 0.0], // emissive
-		[0.4, 0.4, 0.4], // ambient
-		[0.4, 0.4, 0.4], // diffuse
-		[0.5, 0.5, 0.5], // specular
-		1.0				  // shininess
+		[0.3, 0.3, 0.3], // ambient
+		[0.8, 0.8, 0.8], // diffuse
+		[0.8, 0.8, 0.8], // specular
+		5.0				  // shininess
 	);
 
-	lime.material = limeMaterial;
+	lime.material = basicTextureMaterial
+	kiwi.material = basicTextureMaterial
+	pomegranate.material = basicTextureMaterial
 
 	// Camera
 
@@ -267,7 +269,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Skybox
 
-		skybox.draw()
+		// skybox.draw()
 
 
 		// -- Lime
@@ -303,6 +305,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Faucet and Sink
 
+		skybox.texture.load(sphereMappingProgram, 'u_skybox')
 		faucet.draw(camera)
 		sink.draw(camera);
 

@@ -7,8 +7,6 @@ import {
 	createProgram
 } from "./utils.js";
 
-// await new Promise((resolve, _) => setTimeout(() => resolve(), 100))
-
 const { gl, canvas } = createContext('canvas');
 
 gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);

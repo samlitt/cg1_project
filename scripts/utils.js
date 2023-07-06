@@ -368,6 +368,9 @@ export async function createObjectWithMaterials(gl, program, objPath, mtlPath) {
 			set diffuse(newValue) {
 				objects.forEach(o => o.material.diffuse = newValue)
 			},
+			set specular(newValue) {
+				objects.forEach(o => o.material.specular = newValue)
+			},
 			set shininess(newValue) {
 				objects.forEach(o => o.material.shininess = newValue)
 			}
