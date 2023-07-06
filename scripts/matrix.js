@@ -28,7 +28,7 @@ export const vec3 = (() => {
 		p[2] -= origin[2] 
 	
 		out[0] = Math.cos(rad) * p[0] + Math.sin(rad) * p[2]
-		out[1] = point[1]
+		out[1] = p[1]
 		out[2] = -Math.sin(rad) * p[0] + Math.cos(rad) * p[2]
 	
 		out[0] += origin[0]

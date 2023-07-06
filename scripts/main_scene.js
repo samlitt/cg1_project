@@ -70,10 +70,10 @@ export async function createMainScene(gl, width, height) {
 		100
 	)
 
-	const wall = await createObject(gl, baiscTextureProgram, './assets/wall.obj');
+	const wall = await createObject(gl, textureShadingProgram, './assets/wall.obj');
 
-	const floor = await createObject(gl, baiscTextureProgram, './assets/floor.obj');
-	const ceil = await createObject(gl, baiscTextureProgram, './assets/ceil.obj');
+	const floor = await createObject(gl, textureShadingProgram, './assets/floor.obj');
+	const ceil = await createObject(gl, textureShadingProgram, './assets/ceil.obj');
 
 	const window_frame = await createObject(gl, textureShadingProgram, './assets/window.obj');
 	window_frame.material = createMaterial(gl, textureShadingProgram,
@@ -95,13 +95,20 @@ export async function createMainScene(gl, width, height) {
 
 	const shaker = await createObject(gl, sphereMappingProgram, './assets/cocktail_shaker.obj');
 
-	skybox.texture.load(sphereMappingProgram, 'u_skybox')
+	const teapot = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
+	teapot.material = createMaterial(gl, basicShadingProgram,
+		[0, 0, 0],
+		[0.25, 0.20, 0.07],
+		[0.75, 0.61, 0.23],
+		[0.63, 0.56, 0.37],
+		83.2
+	)
 
 	// Lights
 
 	const mainLight = createLight(
 		gl,
-		[-1.0, 1.0, -1.0, 0.0],
+		[-1.0, 1.0, -2.0, 0.0],
 		[1.0, 0.78, 0.79],
 		[1.0, 0.3, 0.3],
 		[0.8, 0.4, 0.4]
@@ -182,10 +189,24 @@ export async function createMainScene(gl, width, height) {
 	kiwi.material = basicTextureMaterial
 	pomegranate.material = basicTextureMaterial
 
+	const wallMaterial = createMaterial(
+		gl,
+		textureShadingProgram,
+		[0.0, 0.0, 0.0], // emissive
+		[0.3, 0.3, 0.3], // ambient
+		[0.8, 0.8, 0.8], // diffuse
+		[0.8, 0.8, 0.8], // specular
+		100.0
+	)
+
+	wall.material = wallMaterial
+	ceil.material = wallMaterial
+	floor.material = wallMaterial
+
 	// Camera
 
-	const cameraEye = [2.0, 2.0, 1.2]
-	const cameraLook = [-1, 1, -1]
+	const cameraEye = [-1.0, 1.75, 0.5]
+	const cameraLook = [-1.0, 1.0, -0.8]
 	const camera = createCamera(gl, toRadian(45), width / height)
 	camera.set(cameraEye, cameraLook, [0.0, 1.0, 0.0])
 	camera.apply(basicShadingProgram)
@@ -200,15 +221,15 @@ export async function createMainScene(gl, width, height) {
 
 	// Camera Movement
 
-	const cameraPos = [0.0, 0.5, 0.0]
+	const cameraPos = [0.0, 0.0, 0.0]
 	const cameraDir = [0.0, 0.0, 0.0]
 
 	const rotationFactor = Math.PI / 128
 	const maxRotation = 2 * Math.PI // Quarter circle
-	let rotation = 0
+	let rotation = -0.5
 
 	const zoomFactor = 0.1
-	const maxZoom = 1
+	const maxZoom = 0.8
 	const minZoom = -4
 	let zoom = 0
 
@@ -230,10 +251,7 @@ export async function createMainScene(gl, width, height) {
 		}
 	})
 
-	// Variables
-
-	const inverseViewMatrix = new Float32Array(9)
-	const camDir = new Float32Array(3)
+	// Positioning
 
 	const identityMatrix = new Float32Array(16)
 	mat4.identity(identityMatrix)
@@ -247,10 +265,7 @@ export async function createMainScene(gl, width, height) {
 	// ipad.worldMatrix = ipadWorldMatrix
 	// ipadScreen.worldMatrix = ipadWorldMatrix
 
-	const teapot1 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-	teapot1.material = basicMaterial
-	mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
-	mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
+	
 
 	// const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
 	// teapot2.material = basicMaterial
@@ -266,6 +281,8 @@ export async function createMainScene(gl, width, height) {
 	// teapotCenter.material = basicMaterial
 	// mat4.translate(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [-1, 0, 3])
 	// mat4.scale(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [0.3, 0.3, 0.3])
+
+	
 
 	const counterWorldMatrix = new Float32Array(16);
 	mat4.identity(counterWorldMatrix);
@@ -291,17 +308,26 @@ export async function createMainScene(gl, width, height) {
 	ipad.worldMatrix = counterWorldMatrix;
 	ipadScreen.worldMatrix = counterWorldMatrix;
 
+	mat4.translate(teapot.worldMatrix, teapot.worldMatrix, [0.7, 0.6, -0.6])
+	mat4.rotate(teapot.worldMatrix, teapot.worldMatrix, toRadian(90), [0, 1, 0])
+	mat4.scale(teapot.worldMatrix, teapot.worldMatrix, [0.15, 0.15, 0.15])
+
+	// Variables
+
+	const inverseViewMatrix = new Float32Array(9)
+	const camDir = new Float32Array(3)
+
 	// Render Loop
 
 	function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
-		pointLight.pos = [...window.lightPos, 1.0]
-		lightGroup.apply(basicShadingProgram)
-		lightGroup.apply(textureShadingProgram)
+		// pointLight.pos = [...window.lightPos, 1.0]
+		// lightGroup.apply(basicShadingProgram)
+		// lightGroup.apply(textureShadingProgram)
 
-		mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
-		mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
+		// mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
+		// mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
 		// -- Camera
 
@@ -337,13 +363,13 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Room
 
-		wall_texture.load(baiscTextureProgram, "u_texture");
+		wall_texture.load(textureShadingProgram, "u_sampler");
 		wall.draw(camera);
 
-		floor_texture.load(baiscTextureProgram, "u_texture");
+		floor_texture.load(textureShadingProgram, "u_sampler");
 		floor.draw(camera);
 
-		ceil_texture.load(baiscTextureProgram, "u_texture");
+		ceil_texture.load(textureShadingProgram, "u_sampler");
 		ceil.draw(camera);
 
 		gl.enable(gl.BLEND)
@@ -403,6 +429,10 @@ export async function createMainScene(gl, width, height) {
 		knife_texture.load(textureShadingProgram, 'u_sampler');
 		knife.draw(camera);
 
+		// -- Teapot
+
+		teapot.draw(camera)
+
 		// -- Glass
 
 		gl.depthMask(false)
@@ -413,15 +443,7 @@ export async function createMainScene(gl, width, height) {
 		glass_texture.load(textureShadingProgram, 'u_sampler');
 		glass.draw(camera);
 
-		gl.disable(gl.BLEND)
-		gl.depthMask(true)
-
 		// -- Absolut Vodka Bottle
-
-		gl.depthMask(false)
-		gl.enable(gl.BLEND)
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-		gl.blendEquation(gl.FUNC_ADD)
 
 		absolut_bottle_texture.load(textureShadingProgram, 'u_sampler');
 		bottle.draw(camera);
