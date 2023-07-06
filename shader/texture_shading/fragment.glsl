@@ -25,6 +25,8 @@ uniform Light u_lights[2];
 
 uniform mat4 u_matView;
 
+uniform bool u_isWindow;
+
 vec3 calculateLight(Light light, vec3 N) {
 	vec3 ambient = light.ambient * u_mtlAmbient;
 
@@ -68,4 +70,7 @@ void main() {
    	gl_FragData[1] = vec4(gl_FragData[0].rgb, 1.0);
    else
    	gl_FragData[1] = vec4(0.0, 0.0, 0.0, 1.0);
+
+	if (u_isWindow && gl_FragData[0].a < 1.0)
+		gl_FragData[1] = gl_FragData[0];
 }
