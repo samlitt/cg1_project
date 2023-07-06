@@ -49,7 +49,6 @@ export async function createMainScene(gl, width, height) {
 
 	const sink = await createObjectWithMaterials(gl, basicShadingProgram, './assets/sink.obj', './assets/sink.mtl');
 	sink.material.ambient = [0.25, 0.25, 0.25];
-	// sink.material.diffuse = [0.6, 0.6, 0.6];
 	sink.material.specular = [0.8, 0.8, 0.8];
 
 	const cutting_board = await createObjectWithMaterials(gl, textureShadingProgram, './assets/cutting_board.obj', './assets/cutting_board.mtl');
@@ -114,10 +113,9 @@ export async function createMainScene(gl, width, height) {
 		[0.8, 0.4, 0.4]
 	);
 
-	window.lightPos = [-0.4, 1.3, -1.4]
 	const pointLight = createLight(
 		gl,
-		[...lightPos, 1.0],
+		[-0.4, 1.3, -1.4, 1.0],
 		[1.0, 1.0, 1.0],
 		[0.85, 0.85, 1.0],
 		[0.9, 0.9, 1.0]
@@ -164,16 +162,6 @@ export async function createMainScene(gl, width, height) {
 	const absolut_bottle_texture = createTexture(gl, await loadImage("./assets/absolut_bottle.png"), 13, true, true);
 
 	// Materials
-
-	const basicMaterial = createMaterial(
-		gl,
-		basicShadingProgram,
-		[0.0, 0.0, 0.0],
-		[0.1, 0.1, 0.1],
-		[0.8, 0.8, 0.8],
-		[1.0, 1.0, 1.0],
-		20.0
-	)
 
 	const basicTextureMaterial = createMaterial(
 		gl,
@@ -262,27 +250,6 @@ export async function createMainScene(gl, width, height) {
 	mat4.scale(ipadWorldMatrix, ipadWorldMatrix, [0.1, 0.1, 0.1])
 	mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(90), [0, 0, 1])
 	mat4.rotate(ipadWorldMatrix, ipadWorldMatrix, toRadian(-90), [1, 0, 0])
-	// ipad.worldMatrix = ipadWorldMatrix
-	// ipadScreen.worldMatrix = ipadWorldMatrix
-
-
-
-	// const teapot2 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-	// teapot2.material = basicMaterial
-	// mat4.translate(teapot2.worldMatrix, teapot2.worldMatrix, [-3, 0, 5])
-	// mat4.scale(teapot2.worldMatrix, teapot2.worldMatrix, [0.3, 0.3, 0.3])
-
-	// const teapot3 = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-	// teapot3.material = basicMaterial
-	// mat4.translate(teapot3.worldMatrix, teapot3.worldMatrix, [-2, 1, 0])
-	// mat4.scale(teapot3.worldMatrix, teapot3.worldMatrix, [0.3, 0.3, 0.3])
-
-	// const teapotCenter = await createObject(gl, basicShadingProgram, './assets/teapot.obj')
-	// teapotCenter.material = basicMaterial
-	// mat4.translate(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [-1, 0, 3])
-	// mat4.scale(teapotCenter.worldMatrix, teapotCenter.worldMatrix, [0.3, 0.3, 0.3])
-
-
 
 	const counterWorldMatrix = new Float32Array(16);
 	mat4.identity(counterWorldMatrix);
@@ -321,13 +288,6 @@ export async function createMainScene(gl, width, height) {
 
 	function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-
-		// pointLight.pos = [...window.lightPos, 1.0]
-		// lightGroup.apply(basicShadingProgram)
-		// lightGroup.apply(textureShadingProgram)
-
-		// mat4.translate(teapot1.worldMatrix, identityMatrix, lightPos)
-		// mat4.scale(teapot1.worldMatrix, teapot1.worldMatrix, [0.03, 0.03, 0.03])
 
 		// -- Camera
 
@@ -451,9 +411,6 @@ export async function createMainScene(gl, width, height) {
 		gl.disable(gl.BLEND)
 		gl.depthMask(true)
 
-		// -- Test Teapots
-
-		// teapot1.draw(camera)
 	}
 
 	return {
