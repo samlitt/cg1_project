@@ -141,6 +141,11 @@ export async function createMainScene(gl, width, height) {
 	gl.bindTexture(gl.TEXTURE_2D, null)
 
 	const wall_texture = createTexture(gl, await loadImage("./assets/wall_bricks.jpg"), 10, true, true);
+	gl.bindTexture(gl.TEXTURE_2D, wall_texture.texture);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+	gl.bindTexture(gl.TEXTURE_2D, null)
+
 	const ceil_texture = createTexture(gl, await loadImage("./assets/concrete_wall.jpg"), 11, true, true);
 	gl.bindTexture(gl.TEXTURE_2D, ceil_texture.texture);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
