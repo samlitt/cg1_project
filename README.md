@@ -1,6 +1,12 @@
 # cg1_project
 WebGL project as an university assignment
 
+# Interaktion mit der Anwendung
+Hab ein wenig Geduld, die Anwendung benötigt ein bisschen Zeit bis sie geladen ist.
+
+Die Kamera kann mit den Tasten `a` und `d` um einen festen Punkt rotiert werden.
+Mit den Tasten `w` und `s` kann ran- bzw. rausgezoomt werden.
+
 # Quellen
 
 ## 3D-Objekte
@@ -20,3 +26,6 @@ WebGL project as an university assignment
 ## Texturen
 - Kitchen counter base [Wood table](https://polyhaven.com/a/wood_table_001)
 - Kitchen counter top [Marble](https://polyhaven.com/a/marble_01)
+- Walls [Patio Tiles](https://polyhaven.com/a/patio_tiles)
+- Floor [Weathered Planks](https://polyhaven.com/a/weathered_planks)
+- Ceiling [Concrete Wall](https://polyhaven.com/a/concrete_wall_007)
