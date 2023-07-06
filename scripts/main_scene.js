@@ -35,7 +35,7 @@ export async function createMainScene(gl, width, height) {
 	ipad.material.diffuse = [0.8, 0.8, 0.8]
 
 	const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj');
-	const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/the_sky_is_on_fire.jpg')
+	const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', './assets/the_sky_is_on_fire.jpg')
 	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(-15), [1, 0, 0])
 	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(30), [0, 1, 0])
 
