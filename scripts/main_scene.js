@@ -35,8 +35,9 @@ export async function createMainScene(gl, width, height) {
 	ipad.material.diffuse = [0.8, 0.8, 0.8]
 
 	const ipadScreen = await createObject(gl, videoProgram, './assets/ipad_screen.obj');
-	const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/skybox.jpg')
-	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(180), [0, 1, 0])
+	const skybox = await createSkyboxSphere(gl, skyboxProgram, './assets/skybox.obj', '/assets/the_sky_is_on_fire.jpg')
+	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(-15), [1, 0, 0])
+	mat4.rotate(skybox.sphere.worldMatrix, skybox.sphere.worldMatrix, toRadian(30), [0, 1, 0])
 
 	const counter_base = await createObjectWithMaterials(gl, textureShadingProgram, './assets/counter_base.obj', './assets/counter_base.mtl');
 	counter_base.material.ambient = [0.7, 0.3, 0.2];
@@ -56,6 +57,9 @@ export async function createMainScene(gl, width, height) {
 
 	const knife = await createObjectWithMaterials(gl, textureShadingProgram, './assets/kitchen_knife.obj', './assets/kitchen_knife.mtl');
 	knife.material.ambient = [0.5, 0.5, 0.5];
+	knife.material.diffuse = [0.5, 0.5, 0.5];
+	knife.material.specular = [0.8, 0.8, 0.8]
+	knife.material.shininess = 200
 
 	const bottle = await createObject(gl, textureShadingProgram, './assets/absolut_bottle.obj');
 	bottle.material = createMaterial(gl, textureShadingProgram,
@@ -100,7 +104,7 @@ export async function createMainScene(gl, width, height) {
 		[-1.0, 1.0, -1.0, 0.0],
 		[1.0, 0.78, 0.79],
 		[1.0, 0.3, 0.3],
-		[1.0, 0.6, 0.6]
+		[0.8, 0.4, 0.4]
 	);
 
 	window.lightPos = [-0.4, 1.3, -1.4]
@@ -128,6 +132,7 @@ export async function createMainScene(gl, width, height) {
 	const cutting_board_texture = createTexture(gl, await loadImage("./assets/cutting_board.jpg"), 6, true, true);
 	const knife_texture = createTexture(gl, await loadImage("./assets/kitchen_knife.png"), 7, true, true);
 	const glass_texture = createTexture(gl, await loadImage("./assets/drinking_glass.png"), 8, true, true);
+	const sphereMapTexture = createTexture(gl, await loadImage('./assets/skybox.jpg'), 9, false, false)
 
 	const floor_texture = createTexture(gl, await loadImage("./assets/weathered_planks.jpg"), 9, true, true);
 	gl.bindTexture(gl.TEXTURE_2D, floor_texture.texture);
@@ -317,7 +322,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Skybox
 
-		// skybox.draw()
+		skybox.draw()
 
 
 		// -- Room
@@ -375,7 +380,7 @@ export async function createMainScene(gl, width, height) {
 
 		// -- Faucet, Sink and Shaker
 
-		skybox.texture.load(sphereMappingProgram, 'u_skybox')
+		sphereMapTexture.load(sphereMappingProgram, 'u_skybox')
 		faucet.draw(camera)
 		sink.draw(camera);
 		shaker.draw(camera);
